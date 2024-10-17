@@ -24,8 +24,8 @@ export interface ButtonProps extends TouchableNativeFeedbackProps {
 }
 
 type ExtraClassType = {
-  text: string;
-  container: string;
+  text: string[];
+  container: string[];
 };
 
 export const BaseButton = styled(TouchableOpacity);
@@ -43,24 +43,23 @@ export default function Button(props: ButtonProps) {
   } = props;
 
   const extraClassName = React.useMemo<ExtraClassType>(() => {
-    const temp = { text: "", container: "" };
+    const temp: ExtraClassType = { text: [], container: [] };
     switch (variant) {
       case "default":
-        temp.text = "text-white";
-        temp.container = "bg-black";
+        temp.text.push("text-white"), temp.container.push("bg-black");
         break;
       case "outlined":
-        temp.text = "text-black";
-        temp.container = "bg-white";
+        temp.text.push("text-black");
+        temp.container.push("bg-white");
         break;
     }
 
     switch (size) {
       case "default":
-        temp.container += " px-5 py-4";
+        temp.container.push("px-5 py-4");
         break;
       default:
-        temp.container += " p-2";
+        temp.container.push("p-2");
     }
     return temp;
   }, [size, variant]);
@@ -74,15 +73,17 @@ export default function Button(props: ButtonProps) {
           onPress();
         }
       }}
-      className={`flex flex-row justify-center border-2 border-black rounded-md ${
-        fill && "w-full"
-      }  ${extraClassName.container} ${className} `}
+      className={[
+        "flex flex-row justify-center border-2 border-black rounded-md",
+        ...extraClassName.container,
+        fill && "flex-1",
+      ].join(" ")}
     >
       <>
         {loading ? (
           <ActivityIndicator color={"black"} />
         ) : (
-          <StyledText className={`${extraClassName.text} `}>
+          <StyledText className={extraClassName.text.join(" ")}>
             {children}
           </StyledText>
         )}

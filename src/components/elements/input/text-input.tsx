@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import InputBaseWrapper, { InputBaseProps } from "./input-base-wrapper";
 import { styled } from "nativewind";
-import { StyledView } from "../common";
-import { EyeCloseIcon, EyeIcon } from "../../assets";
+import { StyledView } from "../../common";
+import { EyeCloseIcon, EyeIcon } from "../../../assets";
 
 export interface TextInputProps
   extends Omit<RawTextInputProps, "placeholder" | "secureTextEntry">,

@@ -1,9 +1,9 @@
 import { EmailIcon, PasswordIcon } from "../assets";
 import { FormProvider, useForm } from "react-hook-form";
-import { UserCreateInput, UserType } from "../store/auth.schema";
+import { UserCreateInput } from "../store/auth.schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import InputField from "../components/elements/text-input-field";
+import InputField from "../components/elements/field/text-input-field";
 import SubmitButton from "../components/elements/submit-button";
 import DefaultLayout from "../components/layout/default-layout";
 import { StyledView } from "../components/common";
@@ -11,7 +11,7 @@ const defaultValues: UserCreateInput = {
   defaultBaseRate: "",
   email: "",
   password: "",
-  type: UserType.User,
+  type: "",
 };
 
 export default function Home() {

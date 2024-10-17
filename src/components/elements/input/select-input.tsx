@@ -6,15 +6,15 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { BaseButton } from "./button";
-import { StyledText, StyledView } from "../common";
+import { BaseButton } from "../button";
+import { StyledText, StyledView } from "../../common";
 import InputBaseWrapper, { InputBaseProps } from "./input-base-wrapper";
-import DefaultFlatList from "../common/flat-list";
-import DrawerBackdrop from "../common/drawer/drawer-backdrop";
-import DrawerBody from "../common/drawer/drawer-body";
-import useDrawer from "../../hooks/use-drawer";
+import DefaultFlatList from "../../common/flat-list";
+import DrawerBackdrop from "../../common/drawer/drawer-backdrop";
+import DrawerBody from "../../common/drawer/drawer-body";
+import useDrawer from "../../../hooks/use-drawer";
 
-export interface ISelectInputOption {
+export interface SelectInputOption {
   value: string | number;
   label: string | number | null;
 }
@@ -22,10 +22,9 @@ export interface ISelectInputOption {
 export interface SelectInputProps extends InputBaseProps {
   disabled?: boolean;
   placeholder?: string | null;
-  label?: string | null;
   noMargin?: boolean;
   value?: string | number;
-  options: ISelectInputOption[];
+  options: SelectInputOption[];
   description?: string | null;
   optional?: boolean;
   onChange?: (value: string | number) => void;
@@ -60,7 +59,7 @@ export default function SelectInput(props: SelectInputProps) {
     drawer!.showCustom({
       render: (dismiss) => (
         <DrawerBackdrop noSafeArea onClose={dismiss}>
-          <DrawerBody style={{ width: "100%" }}>
+          <DrawerBody className="w-full bg-white p-6">
             {title ? (
               <StyledView>
                 <StyledText>{title}</StyledText>
@@ -81,7 +80,7 @@ export default function SelectInput(props: SelectInputProps) {
                     dismiss();
                     onChange?.(item.value);
                   }}
-                  // style={styles.item}
+                  className="p-2 border-b-1 border-blue-500 border-solid"
                 >
                   <StyledText
 
@@ -115,24 +114,9 @@ export default function SelectInput(props: SelectInputProps) {
         onPress={handleOpen}
         disabled={disabled}
       >
-        <View
-          style={StyleSheet.flatten([
-            // styles.fieldContainer,
-            // disabled && styles.disabledField,
-            // !!rest.error && {
-            //   borderColor: color.border.error,
-            // },
-          ])}
-        >
-          <StyledText
-          // style={StyleSheet.flatten([
-          //   disabled && styles.disabledText,
-          //   !value && styles.placeholder,
-          // ])}
-          >
-            {selectedValue?.label || placeholder}
-          </StyledText>
-        </View>
+        <StyledText className="text-black font-normal">
+          {selectedValue?.label || placeholder}
+        </StyledText>
       </TouchableHighlight>
     </InputBaseWrapper>
   );

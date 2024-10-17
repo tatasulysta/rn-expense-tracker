@@ -5,6 +5,7 @@ import Route from "./router";
 import { User } from "./src/store/auth.schema";
 import Credential, { CredentialModel } from "./src/hooks/use-credential";
 import React from "react";
+import { DrawerProvider } from "./src/hooks/use-drawer";
 
 function App() {
   const [persistState, setPersistState] = React.useState<CredentialModel>({
@@ -25,7 +26,9 @@ function App() {
   return (
     <RealmProvider schema={[User]}>
       <Credential credential={persistState}>
-        <Route />
+        <DrawerProvider>
+          <Route />
+        </DrawerProvider>
       </Credential>
     </RealmProvider>
   );

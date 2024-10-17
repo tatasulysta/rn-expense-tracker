@@ -1,5 +1,5 @@
 import React from "react";
-import { StyledText, StyledView } from "../common";
+import { StyledView } from "../../common";
 
 export interface InputBaseProps extends React.PropsWithChildren {
   leftSection?: React.ReactNode;

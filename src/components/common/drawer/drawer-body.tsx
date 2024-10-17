@@ -6,9 +6,15 @@ import { StyledProps } from "nativewind";
 export interface DrawerBodyProps extends StyledProps<ViewProps> {}
 
 const DrawerBody = React.forwardRef<View, DrawerBodyProps>((props, ref) => {
-  const { style, ...rest } = props;
+  const { className, ...rest } = props;
 
-  return <StyledView ref={ref} className="rounded-md" {...rest} />;
+  return (
+    <StyledView
+      ref={ref}
+      className={["rounded-md", className].join(" ")}
+      {...rest}
+    />
+  );
 });
 
 DrawerBody.displayName = "DrawerBody";
