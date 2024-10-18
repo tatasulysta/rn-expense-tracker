@@ -1,5 +1,5 @@
 module.exports = {
-    content: ['./src/**/*.{tsx}'],
+    content: ['./src/**/*.{js,ts,jsx,tsx}'],
     theme: {
         extend: {
             borderWidth: {
@@ -11,6 +11,10 @@ module.exports = {
                 '6': '6px',
                 '8': '8px',
             },
+            maxWidth: {
+                50: "50px",
+                60: "60px"
+            }
         },
     },
     plugins: [],

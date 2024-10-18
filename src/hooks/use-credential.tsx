@@ -1,9 +1,11 @@
 import * as React from "react";
 import { localStorage } from "../helpers/local-storage";
 import { User } from "../store/auth.schema";
+import { LOCAL_STORAGE_KEY } from "../utils/constants";
 
 export type CredentialModel = {
   user: (User & { token: string }) | undefined;
+  isLoading: boolean;
 };
 
 export interface CredentialStateProps {
@@ -32,11 +34,15 @@ export default function Credential(props: Props) {
     () => ({
       credential: userCredential,
       setCredential: async (credential) => {
+        console.log("CREDENTIAL", credential);
         if (!credential) {
-          await localStorage.removeItem("credential");
+          await localStorage.removeItem(LOCAL_STORAGE_KEY.credential);
           setUserCredential(undefined);
         } else {
-          await localStorage.setItem("credential", JSON.stringify(credential));
+          await localStorage.setItem(
+            LOCAL_STORAGE_KEY.credential,
+            JSON.stringify(credential),
+          );
           setUserCredential(credential);
         }
       },
@@ -52,6 +58,5 @@ export default function Credential(props: Props) {
 }
 
 export function useCredential() {
-  const context = React.useContext(CredentialContext);
-  return context;
+  return React.useContext(CredentialContext);
 }

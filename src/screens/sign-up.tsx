@@ -1,59 +1,120 @@
-import { EmailIcon, PasswordIcon } from "../assets";
-import { FormProvider, useForm } from "react-hook-form";
-import { UserCreateInput } from "../store/auth.schema";
+import { EmailIcon, InfoIcon, PasswordIcon } from "../assets";
+import { FormProvider, Resolver, useForm } from "react-hook-form";
+import { User, UserCreateInput, UserTypeEnum } from "../store/auth.schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import InputField from "../components/elements/field/text-input-field";
 import SubmitButton from "../components/elements/submit-button";
 import DefaultLayout from "../components/layout/default-layout";
-import { StyledView } from "../components/common";
+import { StyledText, StyledView } from "../components/common";
+import Input from "../components/elements/field";
+import RateSelectInput from "./components/rate-select-input";
+import { useQuery } from "@realm/react";
+import RoleSelectInput from "./components/role-select-input";
+import { SIGN_IN_SCREEN_ROUTE } from "../../router-type";
+import { useNavigation } from "../hooks/use-navigation";
+import { useRealm } from "../hooks/use-realm";
+
 const defaultValues: UserCreateInput = {
   defaultBaseRate: "",
   email: "",
   password: "",
-  type: "",
+  type: UserTypeEnum.User,
 };
 
-export default function Home() {
-  const resolver = yupResolver(
-    Yup.object({
-      defaultBaseRate: Yup.string().required().nullable(),
-      email: Yup.string().email().required().nullable(),
-      password: Yup.string().required().nullable(),
-    }),
-  );
+const resolver = yupResolver<UserCreateInput>(
+  Yup.object({
+    defaultBaseRate: Yup.string().required(),
+    email: Yup.string().email().required(),
+    password: Yup.string().required(),
+    type: Yup.string()
+      .required()
+      .oneOf([UserTypeEnum.Admin, UserTypeEnum.User]),
+  }),
+);
 
-  const methods = useForm({ mode: "onChange", defaultValues, resolver });
+export default function SignUp() {
+  const { navigate } = useNavigation();
+
+  const realm = useRealm();
+  const users = realm.user?.objects("User") as unknown as User[];
+  const hasAdmin =
+    !users.length ||
+    users.findIndex((user) => user.type === UserTypeEnum.Admin) !== -1;
+
+  const methods = useForm<UserCreateInput>({
+    mode: "onChange",
+    defaultValues: {
+      ...defaultValues,
+      type: hasAdmin ? UserTypeEnum.User : UserTypeEnum.Admin,
+    },
+    resolver,
+  });
+
   const onSubmit = (values: UserCreateInput) => {
-    console.log(values);
+    try {
+      if (users.find((user) => user.email === values.email)) {
+        throw new Error("This email registered! Use other email!");
+      }
+      realm.user!.write(() => {
+        realm.user?.create("User", values);
+        methods.reset();
+      });
+      console.log("Success");
+      navigate(SIGN_IN_SCREEN_ROUTE);
+    } catch (e) {
+      console.log("Error", e);
+    }
   };
 
   return (
-    <DefaultLayout>
+    <DefaultLayout className="justify-center">
       <FormProvider {...methods}>
-        <StyledView className="flex flex-end justify-end flex-1">
-          <StyledView className="flex flex-col" style={{ gap: 32 }}>
-            <InputField
-              type="email"
-              name="email"
-              placeholder="Email"
-              icon={(size) => <EmailIcon size={size} />}
-            />
-            <InputField
-              type="password"
-              name="password"
-              placeholder="Password"
-              icon={(size) => <PasswordIcon size={size} />}
-            />
-            {/* <InputField
-          type="default "
-          name="password"
-          placeholder="Password"
-          icon={(size) => <PasswordIcon size={size} />}
-          /> */}
-            <SubmitButton onSubmit={onSubmit} fill>
-              Register
-            </SubmitButton>
+        <StyledView className="flex flex-col" style={{ gap: 32 }}>
+          <StyledView className="flex justify-center items-center gap-1 mt-3">
+            <StyledText className="text-xl">
+              Welcome to the Expense Tracker App!
+            </StyledText>
+          </StyledView>
+          <StyledView>
+            <RoleSelectInput name="type" disabled={hasAdmin} />
+            <StyledView className="flex flex-1 items-center flex-row gap-2 mt-1 text-neutral-500">
+              <InfoIcon size={16} />
+              <StyledText className="text-sm">
+                Each device only can have one Admin
+              </StyledText>
+            </StyledView>
+          </StyledView>
+
+          <Input
+            type="email"
+            name="email"
+            placeholder="Email"
+            icon={(size) => <EmailIcon size={size} />}
+          />
+          <Input
+            type="password"
+            name="password"
+            placeholder="Password"
+            icon={(size) => <PasswordIcon size={size} />}
+          />
+          <RateSelectInput
+            name="defaultBaseRate"
+            placeholder="Select your Base Rate"
+          />
+
+          <SubmitButton onSubmit={onSubmit} fill>
+            Sign Up
+          </SubmitButton>
+          <StyledView className="flex flex-row gap-1">
+            <StyledText className="text-base">
+              Already have an account?
+            </StyledText>
+            <StyledText
+              className="text-base text-blue-700 font-semibold"
+              onPress={() => navigate(SIGN_IN_SCREEN_ROUTE)}
+            >
+              Sign In
+            </StyledText>
           </StyledView>
         </StyledView>
       </FormProvider>

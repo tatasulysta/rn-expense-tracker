@@ -1,10 +1,5 @@
 import * as React from "react";
-import {
-  StyleSheet,
-  TouchableHighlight,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { TouchableHighlight } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BaseButton } from "../button";
 import { StyledText, StyledView } from "../../common";
@@ -30,6 +25,7 @@ export interface SelectInputProps extends InputBaseProps {
   onChange?: (value: string | number) => void;
   snapPoints?: (string | number)[];
   title?: string | null;
+  editable?: boolean;
 }
 
 export default function SelectInput(props: SelectInputProps) {
@@ -44,8 +40,6 @@ export default function SelectInput(props: SelectInputProps) {
     error,
     leftSection,
     rightSection,
-
-    ...rest
   } = props;
   const { bottom: safeBottomArea } = useSafeAreaInsets();
   const drawer = useDrawer();
@@ -114,7 +108,12 @@ export default function SelectInput(props: SelectInputProps) {
         onPress={handleOpen}
         disabled={disabled}
       >
-        <StyledText className="text-black font-normal">
+        <StyledText
+          className={[
+            "font-normal",
+            selectedValue?.label ? "text-black" : "text-neutral-400",
+          ].join(" ")}
+        >
           {selectedValue?.label || placeholder}
         </StyledText>
       </TouchableHighlight>

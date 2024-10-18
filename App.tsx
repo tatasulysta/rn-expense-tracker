@@ -1,15 +1,15 @@
-import { RealmProvider } from "@realm/react";
-
 import { withExpoSnack } from "nativewind";
 import Route from "./router";
 import { User } from "./src/store/auth.schema";
 import Credential, { CredentialModel } from "./src/hooks/use-credential";
 import React from "react";
 import { DrawerProvider } from "./src/hooks/use-drawer";
+import { RealmProvider } from "./src/hooks/use-realm";
 
 function App() {
   const [persistState, setPersistState] = React.useState<CredentialModel>({
     user: undefined,
+    isLoading: true,
   });
 
   React.useEffect(() => {
@@ -17,6 +17,7 @@ function App() {
       const credential = (await localStorage.getItem("credential")) as any;
       setPersistState({
         user: credential ? JSON.parse(credential) : undefined,
+        isLoading: false,
       });
     }
 
@@ -24,7 +25,7 @@ function App() {
   }, []);
 
   return (
-    <RealmProvider schema={[User]}>
+    <RealmProvider>
       <Credential credential={persistState}>
         <DrawerProvider>
           <Route />

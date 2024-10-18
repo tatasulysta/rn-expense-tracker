@@ -1,34 +1,73 @@
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import {
+  CompositeNavigationProp,
+  NavigationContainer,
+  RouteProp,
+  useNavigation,
+} from "@react-navigation/native";
+import {
+  CATEGORY_SCREEN_CREATE_PARAMS,
+  CATEGORY_SCREEN_CREATE_ROUTE,
   CATEGORY_SCREEN_PARAMS,
   CATEGORY_SCREEN_ROUTE,
+  CATEGORY_SCREEN_VIEW_PARAMS,
+  CATEGORY_SCREEN_VIEW_ROUTE,
   HOME_SCREEN_PARAMS,
   HOME_SCREEN_ROUTE,
   MUTATION_SCREEN_PARAMS,
   MUTATION_SCREEN_ROUTE,
   PROFILE_SCREEN_PARAMS,
   PROFILE_SCREEN_ROUTE,
+  SIGN_IN_SCREEN_PARAMS,
+  SIGN_IN_SCREEN_ROUTE,
+  SIGN_UP_SCREEN_PARAMS,
+  SIGN_UP_SCREEN_ROUTE,
 } from "./router-type";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import {
+  createNativeStackNavigator,
+  NativeStackNavigationProp,
+} from "@react-navigation/native-stack";
 import Home from "./src/screens/home";
-import MutationScreen from "./src/screens/add-spend";
+import MutationScreen from "./src/screens/mutation";
 import { HomeIcon, MutationIcon, UserIcon } from "./src/assets";
 import ProfileScreen from "./src/screens/profile";
 import { Dimensions, Platform } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { BaseButton } from "./src/components/elements/button";
 import { StyledText } from "./src/components/common";
-export type ParamsList = {
-  Main: undefined;
+import { useCredential } from "./src/hooks/use-credential";
+import SignIn from "./src/screens/sign-in";
+import SignUp from "./src/screens/sign-up";
+import CategoryCreate from "./src/screens/category/create";
+import CategoryView from "./src/screens/category/view";
 
+export type ParamsList = {
+  [SIGN_IN_SCREEN_ROUTE]: SIGN_IN_SCREEN_PARAMS;
+  [SIGN_UP_SCREEN_ROUTE]: SIGN_UP_SCREEN_PARAMS;
+
+  Main: undefined;
   [HOME_SCREEN_ROUTE]: HOME_SCREEN_PARAMS;
   [CATEGORY_SCREEN_ROUTE]: CATEGORY_SCREEN_PARAMS;
   [MUTATION_SCREEN_ROUTE]: MUTATION_SCREEN_PARAMS;
   [PROFILE_SCREEN_ROUTE]: PROFILE_SCREEN_PARAMS;
+
+  [CATEGORY_SCREEN_VIEW_ROUTE]: CATEGORY_SCREEN_VIEW_PARAMS;
+  [CATEGORY_SCREEN_CREATE_ROUTE]: CATEGORY_SCREEN_CREATE_PARAMS;
 };
 
 const Stack = createNativeStackNavigator<ParamsList>();
 const Tabs = createBottomTabNavigator<ParamsList>();
+
+export type StackNavigationType<T extends keyof ParamsList> =
+  CompositeNavigationProp<
+    NativeStackNavigationProp<ParamsList, T>,
+    // BottomTabNavigationProp<TabsParamList>
+    any
+  >;
+
+export interface StackNavigationScreenProps<T extends keyof ParamsList> {
+  navigation: StackNavigationType<T>;
+  route: RouteProp<ParamsList, T>;
+}
 
 type Tab = {
   name: keyof ParamsList;
@@ -127,6 +166,7 @@ function Main() {
   );
 }
 export default function Route() {
+  const { credential } = useCredential();
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -135,7 +175,24 @@ export default function Route() {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="Main" component={Main} />
+        {!!credential && !!credential?.user ? (
+          <>
+            <Stack.Screen name="Main" component={Main} />
+            <Stack.Screen
+              name={CATEGORY_SCREEN_CREATE_ROUTE}
+              component={CategoryCreate}
+            />
+            <Stack.Screen
+              name={CATEGORY_SCREEN_VIEW_ROUTE}
+              component={CategoryView}
+            />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name={SIGN_IN_SCREEN_ROUTE} component={SignIn} />
+            <Stack.Screen name={SIGN_UP_SCREEN_ROUTE} component={SignUp} />
+          </>
+        )}
         {/* <Stack.Screen name={HOME_SCREEN_ROUTE} component={Home}></Stack.Screen>
 
         <Stack.Screen
