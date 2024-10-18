@@ -12,8 +12,9 @@ import { useRealm } from "../../hooks/use-realm";
 import DefaultScrollView from "../../components/common/scroll-view";
 import { StyleSheet } from "react-native";
 import * as Yup from "yup";
-import { MUTATION_SCREEN_ROUTE } from "../../../router-type";
+
 import { useNavigation } from "../../hooks/use-navigation";
+import { MUTATION_SCREEN_ROUTE } from "../../../router-type";
 interface Props {
   category?: Category;
 }
@@ -29,7 +30,7 @@ export default function CategoryForm(props: Props) {
   const { category } = props;
   const { credential } = useCredential();
   const { navigate } = useNavigation();
-  const { category: realmCategory } = useRealm();
+  const realm = useRealm();
   const [color, setColor] = React.useState<string>(CategoryColor[0]);
   const [icon, setIcon] = React.useState<string>(CategoryIconKey[0]);
 
@@ -41,26 +42,27 @@ export default function CategoryForm(props: Props) {
       label,
       icon,
     };
-    console.log(realmCategory);
+
     try {
-      // await validation.validate(values);
-      // if (category) {
-      //   realm.category!.write(() => {
-      //     category.color = color;
-      //     category.label = label;
-      //     category.icon = icon;
-      //   });
-      // } else
-      //   realm.category!.write(() => {
-      //     realm.category?.create("Category", {
-      //       color,
-      //       icon,
-      //       label: label,
-      //       type: CategoryType.Personal,
-      //       user: credential?.user,
-      //     });
-      //   });
-      // navigate(MUTATION_SCREEN_ROUTE);
+      await validation.validate(values);
+      if (category) {
+        realm.category!.write(() => {
+          category.color = color;
+          category.label = label;
+          category.icon = icon;
+        });
+      } else
+        realm.category!.write(() => {
+          realm.category?.create("Category", {
+            color,
+            icon,
+            label: label,
+            type: CategoryType.Personal,
+            userId: `${credential?.user?._id}`,
+          });
+        });
+      console.log("success");
+      navigate(MUTATION_SCREEN_ROUTE);
     } catch (e) {
       console.log(e);
     }
@@ -76,7 +78,7 @@ export default function CategoryForm(props: Props) {
           {`${category ? "Edit" : "New"} Category`}
         </StyledText>
         {/* PREVIEW */}
-        <StyledView className="flex-1 flex flex-grow-0">
+        <StyledView className="flex-1 flex flex-grow-0 max-w-60">
           <StyledView
             className={[
               color,
@@ -84,7 +86,9 @@ export default function CategoryForm(props: Props) {
             ].join(" ")}
           >
             {CategoryIcon[icon]({ size: 50 })}
-            <StyledText className="text-base">{label}</StyledText>
+            <StyledText className="text-base max-w-fit text-center text-ellipsis text-nowrap">
+              {label}
+            </StyledText>
           </StyledView>
         </StyledView>
 

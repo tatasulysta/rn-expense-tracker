@@ -25,13 +25,13 @@ function App() {
   }, []);
 
   return (
-    <RealmProvider>
-      <Credential credential={persistState}>
-        <DrawerProvider>
+    <Credential credential={persistState}>
+      <DrawerProvider>
+        <RealmProvider>
           <Route />
-        </DrawerProvider>
-      </Credential>
-    </RealmProvider>
+        </RealmProvider>
+      </DrawerProvider>
+    </Credential>
   );
 }
 

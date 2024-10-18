@@ -10,12 +10,14 @@ import SubmitButton from "../components/elements/submit-button";
 import { sign } from "react-native-pure-jwt";
 import { SECRET_KEY } from "../utils/constants";
 import { useCredential } from "../hooks/use-credential";
-
+import Realm from "realm";
 import { SIGN_IN_SCREEN_ROUTE, SIGN_UP_SCREEN_ROUTE } from "../../router-type";
 import { Keyboard } from "react-native";
 import { StackNavigationScreenProps } from "../../router";
 import { useRealm } from "../hooks/use-realm";
 import { useNavigation } from "../hooks/use-navigation";
+import Button from "../components/elements/button";
+import DefaultScrollView from "../components/common/scroll-view";
 
 type FormType = {
   password: string;
@@ -86,41 +88,43 @@ export default function SignIn(props: Props) {
 
   return (
     <DefaultLayout className="justify-center">
-      <FormProvider {...methods}>
-        <StyledView className="flex flex-col" style={{ gap: 32 }}>
-          <StyledView className="flex justify-center items-center gap-1 mt-3">
-            <StyledText className="text-xl">Hi,Welcome Back!</StyledText>
-          </StyledView>
+      <DefaultScrollView>
+        <FormProvider {...methods}>
+          <StyledView className="flex flex-col" style={{ gap: 32 }}>
+            <StyledView className="flex justify-center items-center gap-1 mt-3">
+              <StyledText className="text-xl">Hi,Welcome Back!</StyledText>
+            </StyledView>
 
-          <Input
-            type="email"
-            name="email"
-            placeholder="Email"
-            icon={(size) => <EmailIcon size={size} />}
-          />
-          <Input
-            type="password"
-            name="password"
-            placeholder="Password"
-            icon={(size) => <PasswordIcon size={size} />}
-          />
+            <Input
+              type="email"
+              name="email"
+              placeholder="Email"
+              icon={(size) => <EmailIcon size={size} />}
+            />
+            <Input
+              type="password"
+              name="password"
+              placeholder="Password"
+              icon={(size) => <PasswordIcon size={size} />}
+            />
 
-          <SubmitButton onSubmit={onSubmit} fill>
-            Sign In
-          </SubmitButton>
-          <StyledView className="flex flex-row gap-1">
-            <StyledText className="text-base">
-              Don't have an account?
-            </StyledText>
-            <StyledText
-              className="text-base text-blue-700 font-semibold"
-              onPress={() => navigate(SIGN_UP_SCREEN_ROUTE)}
-            >
-              Sign Up
-            </StyledText>
+            <SubmitButton onSubmit={onSubmit} fill>
+              Sign In
+            </SubmitButton>
+            <StyledView className="flex flex-row gap-1">
+              <StyledText className="text-base">
+                Don't have an account?
+              </StyledText>
+              <StyledText
+                className="text-base text-blue-700 font-semibold"
+                onPress={() => navigate(SIGN_UP_SCREEN_ROUTE)}
+              >
+                Sign Up
+              </StyledText>
+            </StyledView>
           </StyledView>
-        </StyledView>
-      </FormProvider>
+        </FormProvider>
+      </DefaultScrollView>
     </DefaultLayout>
   );
 }
