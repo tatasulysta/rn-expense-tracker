@@ -23,6 +23,7 @@ import { useRealm } from "../hooks/use-realm";
 import DefaultScrollView from "../components/common/scroll-view";
 import { CategoryColor, CategoryIcon } from "./category/helper";
 import { format, startOfMonth } from "date-fns";
+import { resetTime } from "../utils/date";
 
 const defaultValues: UserCreateInput = {
   defaultBaseRate: "",
@@ -98,7 +99,7 @@ export default function SignUp() {
       });
       realm.wallet!.write(() => {
         realm.wallet?.create("Wallet", {
-          date: startOfMonth(new Date()),
+          date: startOfMonth(resetTime(new Date())),
           userId: `${user._id}`,
         } as WalletCreateInput);
       });
