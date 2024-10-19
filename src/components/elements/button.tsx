@@ -18,15 +18,10 @@ export interface ButtonProps extends TouchableNativeFeedbackProps {
   onPress: () => void;
   size?: "default" | "small";
   fill?: boolean;
-  left?: (color: string, size: number) => React.ReactNode;
-  right?: (color: string, size: number) => React.ReactNode;
+  left?: (size: number) => React.ReactNode;
+  right?: (size: number) => React.ReactNode;
   upperText?: boolean;
 }
-
-type ExtraClassType = {
-  text: string[];
-  container: string[];
-};
 
 export const BaseButton = styled(TouchableOpacity);
 export default function Button(props: ButtonProps) {
@@ -39,30 +34,14 @@ export default function Button(props: ButtonProps) {
     variant = "default",
     size = "default",
     className,
+    left,
+    right,
+
     ...rest
   } = props;
 
-  const extraClassName = React.useMemo<ExtraClassType>(() => {
-    const temp: ExtraClassType = { text: [], container: [] };
-    switch (variant) {
-      case "default":
-        temp.text.push("text-white"), temp.container.push("bg-black");
-        break;
-      case "outlined":
-        temp.text.push("text-black");
-        temp.container.push("bg-white");
-        break;
-    }
-
-    switch (size) {
-      case "default":
-        temp.container.push("px-5 py-4");
-        break;
-      default:
-        temp.container.push("p-2");
-    }
-    return temp;
-  }, [size, variant]);
+  const isDefault = variant === "default";
+  const isSizeDefault = size === "default";
 
   return (
     <BaseButton
@@ -73,20 +52,20 @@ export default function Button(props: ButtonProps) {
           onPress();
         }
       }}
-      className={[
-        "flex flex-row justify-center border-2 border-black rounded-md",
-        ...extraClassName.container,
-        fill && "flex-1",
-      ].join(" ")}
+      className={`${className} flex flex-row justify-center border-2 border-black rounded-md gap-y-2 ${
+        isDefault ? "bg-black" : "bg-white"
+      } ${isSizeDefault ? "px-5 py-4" : "p-2"} ${fill && "flex-1"}`}
     >
       <>
+        {left?.(isSizeDefault ? 22 : 18)}
         {loading ? (
           <ActivityIndicator color={"black"} />
         ) : (
-          <StyledText className={extraClassName.text.join(" ")}>
+          <StyledText className={isDefault ? "text-white" : "text-black"}>
             {children}
           </StyledText>
         )}
+        {right?.(isSizeDefault ? 22 : 18)}
       </>
     </BaseButton>
   );

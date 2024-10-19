@@ -40,6 +40,7 @@ export default function SelectInput(props: SelectInputProps) {
     error,
     leftSection,
     rightSection,
+    label,
   } = props;
   const { bottom: safeBottomArea } = useSafeAreaInsets();
   const drawer = useDrawer();
@@ -74,7 +75,7 @@ export default function SelectInput(props: SelectInputProps) {
                     dismiss();
                     onChange?.(item.value);
                   }}
-                  className="p-2 border-b-1 border-blue-500 border-solid"
+                  className="p-2"
                 >
                   <StyledText
 
@@ -101,6 +102,7 @@ export default function SelectInput(props: SelectInputProps) {
       error={error}
       leftSection={leftSection}
       rightSection={rightSection}
+      label={label}
     >
       <TouchableHighlight
         accessibilityRole="button"
@@ -110,7 +112,7 @@ export default function SelectInput(props: SelectInputProps) {
       >
         <StyledText
           className={[
-            "font-normal",
+            "font-base py-1",
             selectedValue?.label ? "text-black" : "text-neutral-400",
           ].join(" ")}
         >

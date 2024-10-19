@@ -33,4 +33,7 @@ export {
   Gear as GearIcon,
   Cloud as CloudIcon,
   Camera as CameraIcon,
+  ArrowLeft as ArrowLeftIcon,
+  Pencil as PencilIcon,
+  CaretLeft as CaretLeftIcon,
 } from "phosphor-react-native";

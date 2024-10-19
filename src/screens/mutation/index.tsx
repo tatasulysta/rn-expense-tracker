@@ -11,6 +11,7 @@ import { CATEGORY_SCREEN_CREATE_ROUTE } from "../../../router-type";
 import { useCredential } from "../../hooks/use-credential";
 import { Category } from "../../store/auth.schema";
 import { CategoryIcon } from "../category/helper";
+import CategoryButton from "../components/category";
 
 export default function MutationScreen() {
   const realm = useRealm();
@@ -40,21 +41,12 @@ export default function MutationScreen() {
           className="gap-4 flex-grow-0 p-4 bg-white"
         >
           {categories.map((category, index) => (
-            <BaseButton
+            <CategoryButton
               key={index}
-              className={[
-                category.color,
-                "p-2 flex-grow-0 self-start max-w-60 items-center rounded-lg",
-              ].join(" ")}
-            >
-              {CategoryIcon[category.icon]({ size: 50 })}
-              <StyledText
-                className="max-w-fit text-center text-ellipsis text-nowrap"
-                numberOfLines={2}
-              >
-                {category.label}
-              </StyledText>
-            </BaseButton>
+              color={category.color}
+              icon={category.icon}
+              label={category.label}
+            />
           ))}
 
           <BaseButton

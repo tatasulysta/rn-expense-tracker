@@ -8,20 +8,25 @@ interface Props {
   name: string;
   baseRate?: string;
   placeholder?: string;
+  onAfterChange?: (value: number) => void;
+  label?: string;
 }
 
 export default function RateSelectInput(props: Props) {
-  const { name, baseRate = "IDR", placeholder } = props;
-  const { data, error, loading } = useGetRates(baseRate);
+  const { name, baseRate = "IDR", placeholder, onAfterChange, label } = props;
+  const { data, loading } = useGetRates(baseRate);
 
+  const conversionRates = data?.conversion_rates || {};
   return (
     <Input
       name={name}
+      label={label}
       type="select"
-      options={Object.keys(data?.conversion_rates || {}).map((key) => ({
+      options={Object.keys(conversionRates).map((key) => ({
         label: key,
         value: key,
       }))}
+      onAfterChange={(key) => onAfterChange?.(conversionRates[key])}
       placeholder={placeholder}
       leftSection={<MoneyIcon size={24} />}
       rightSection={loading && <ActivityIndicator color="black" />}

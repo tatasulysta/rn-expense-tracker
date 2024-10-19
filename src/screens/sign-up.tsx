@@ -6,6 +6,7 @@ import {
   User,
   UserCreateInput,
   UserTypeEnum,
+  WalletCreateInput,
 } from "../store/auth.schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
@@ -21,6 +22,7 @@ import { useNavigation } from "../hooks/use-navigation";
 import { useRealm } from "../hooks/use-realm";
 import DefaultScrollView from "../components/common/scroll-view";
 import { CategoryColor, CategoryIcon } from "./category/helper";
+import { format, startOfMonth } from "date-fns";
 
 const defaultValues: UserCreateInput = {
   defaultBaseRate: "",
@@ -93,6 +95,12 @@ export default function SignUp() {
         createCategories(`${user._id}`).map((cat) =>
           realm.category?.create("Category", cat),
         );
+      });
+      realm.wallet!.write(() => {
+        realm.wallet?.create("Wallet", {
+          date: startOfMonth(new Date()),
+          userId: `${user._id}`,
+        } as WalletCreateInput);
       });
       methods.reset();
 

@@ -21,7 +21,8 @@ export interface TextInputProps
 
 const StyledRawTextInput = styled(RawTextInput);
 export default function TextInput(props: TextInputProps) {
-  const { type, icon, leftSection, rightSection, error, ...rest } = props;
+  const { type, icon, leftSection, rightSection, error, label, ...rest } =
+    props;
   const isPassword = type === "password";
   const [showPassword, setShowPassword] = React.useState(isPassword);
 
@@ -56,6 +57,7 @@ export default function TextInput(props: TextInputProps) {
 
   return (
     <InputBaseWrapper
+      label={label}
       leftSection={
         <StyledView className="flex flex-row items-center">
           {icon?.(24)}

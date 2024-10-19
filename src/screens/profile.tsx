@@ -32,7 +32,9 @@ export default function ProfileScreen() {
   return (
     <StyledView>
       <StyledText>hehe</StyledText>
-      <Button onPress={() => deleteUserById()}>Delete Me</Button>
+      <Button onPress={() => deleteUserById()} className="text-white">
+        Delete sMe
+      </Button>
     </StyledView>
   );
 }

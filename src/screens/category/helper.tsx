@@ -75,3 +75,4 @@ export const CategoryIcon = {
   cloud: ({ size }: { size: number }) => <CloudIcon size={size} />,
   camera: ({ size }: { size: number }) => <CameraIcon size={size} />,
 };
+export const CategoryIconKey = Object.keys(CategoryIcon);

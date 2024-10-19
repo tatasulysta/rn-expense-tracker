@@ -36,10 +36,7 @@ const resolver = yupResolver<FormType>(
   }),
 );
 
-interface Props
-  extends StackNavigationScreenProps<typeof SIGN_IN_SCREEN_ROUTE> {}
-
-export default function SignIn(props: Props) {
+export default function SignIn() {
   const realm = useRealm();
   const { navigate, reset } = useNavigation();
   const { setCredential } = useCredential();
@@ -92,7 +89,9 @@ export default function SignIn(props: Props) {
         <FormProvider {...methods}>
           <StyledView className="flex flex-col" style={{ gap: 32 }}>
             <StyledView className="flex justify-center items-center gap-1 mt-3">
-              <StyledText className="text-xl">Hi,Welcome Back!</StyledText>
+              <StyledText className="text-xl text-center">
+                Hi,Welcome Back!
+              </StyledText>
             </StyledView>
 
             <Input

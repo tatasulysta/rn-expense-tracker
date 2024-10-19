@@ -9,11 +9,7 @@ const DrawerBody = React.forwardRef<View, DrawerBodyProps>((props, ref) => {
   const { className, ...rest } = props;
 
   return (
-    <StyledView
-      ref={ref}
-      className={["rounded-md", className].join(" ")}
-      {...rest}
-    />
+    <StyledView ref={ref} className={`${className} rounded-md`} {...rest} />
   );
 });
 

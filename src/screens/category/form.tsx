@@ -2,12 +2,17 @@ import React from "react";
 import DefaultLayout from "../../components/layout/default-layout";
 import { StyledText, StyledView } from "../../components/common";
 import TextInput from "../../components/elements/input/text-input";
-import { CategoryColor, CategoryIcon } from "./helper";
+import { CategoryColor, CategoryIcon, CategoryIconKey } from "./helper";
 // import { useCredential } from "../../hooks/use-credential";
 import DefaultFlatList from "../../components/common/flat-list";
 import Button, { BaseButton } from "../../components/elements/button";
 import { useCredential } from "../../hooks/use-credential";
-import { Category, CategoryType } from "../../store/auth.schema";
+import {
+  Category,
+  CategoryCreateInput,
+  CategoryType,
+  UserTypeEnum,
+} from "../../store/auth.schema";
 import { useRealm } from "../../hooks/use-realm";
 import DefaultScrollView from "../../components/common/scroll-view";
 import { StyleSheet } from "react-native";
@@ -15,17 +20,25 @@ import * as Yup from "yup";
 
 import { useNavigation } from "../../hooks/use-navigation";
 import { MUTATION_SCREEN_ROUTE } from "../../../router-type";
+import { useForm } from "react-hook-form";
+import ColorSelector from "./components/color-selector";
+import IconSelector from "./components/icon-selector";
+import UserSelectInput from "../components/user-state-select-input";
+import Header from "../../components/widgets/header";
 interface Props {
   category?: Category;
 }
 
-const validation = Yup.object({
-  color: Yup.string().required(),
-  icon: Yup.string().required(),
-  label: Yup.string().required(),
-});
+const validation = (isAdmin: boolean) =>
+  Yup.object({
+    color: Yup.string().required(),
+    icon: Yup.string().required(),
+    label: Yup.string().required(),
+    ...(isAdmin && {
+      userId: Yup.string().required(),
+    }),
+  });
 
-const CategoryIconKey = Object.keys(CategoryIcon);
 export default function CategoryForm(props: Props) {
   const { category } = props;
   const { credential } = useCredential();
@@ -35,16 +48,19 @@ export default function CategoryForm(props: Props) {
   const [icon, setIcon] = React.useState<string>(CategoryIconKey[0]);
 
   const [label, setLabel] = React.useState<string>("");
+  const [userId, setUserId] = React.useState<string>("");
 
+  const isAdmin = credential?.user?.type === UserTypeEnum.Admin;
   const onSave = async () => {
     const values = {
       color,
       label,
       icon,
+      userId,
     };
 
     try {
-      await validation.validate(values);
+      await validation(isAdmin).validate(values);
       if (category) {
         realm.category!.write(() => {
           category.color = color;
@@ -58,25 +74,20 @@ export default function CategoryForm(props: Props) {
             icon,
             label: label,
             type: CategoryType.Personal,
-            userId: `${credential?.user?._id}`,
+            userId: isAdmin ? userId : `${credential?.user?._id}`,
           });
         });
-      console.log("success");
       navigate(MUTATION_SCREEN_ROUTE);
     } catch (e) {
       console.log(e);
     }
   };
 
-  const hehe = {
-    "#": "hdhd",
-  };
   return (
-    <DefaultLayout>
+    <DefaultLayout
+      header={<Header title={`${category ? "Edit" : "New"} Category`} />}
+    >
       <DefaultScrollView className="flex flex-1 gap-6">
-        <StyledText className="text-xl font-semibold">
-          {`${category ? "Edit" : "New"} Category`}
-        </StyledText>
         {/* PREVIEW */}
         <StyledView className="flex-1 flex flex-grow-0 max-w-60">
           <StyledView
@@ -91,7 +102,14 @@ export default function CategoryForm(props: Props) {
             </StyledText>
           </StyledView>
         </StyledView>
-
+        {isAdmin && (
+          <StyledView>
+            <UserSelectInput
+              value={userId}
+              onChange={(value) => setUserId(value)}
+            />
+          </StyledView>
+        )}
         <StyledView>
           <TextInput
             placeholder="Enter Category Label"
@@ -100,64 +118,16 @@ export default function CategoryForm(props: Props) {
             onChangeText={(text) => setLabel(text)}
           />
         </StyledView>
-
-        <StyledView className="gap-y-2">
-          <StyledText className="text-base">Choose Background Color</StyledText>
-          <DefaultScrollView horizontal>
-            <DefaultFlatList
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              columnWrapperStyle={styles.flatListColumn}
-              data={CategoryColor}
-              numColumns={15}
-              renderItem={({ item }) => (
-                <BaseButton
-                  className={[
-                    item,
-                    "p-2 rounded-md",
-                    color === item && "border-1 border-black border-solid",
-                  ].join(" ")}
-                  style={{ width: 32, height: 32 }}
-                  onPress={() => setColor(item)}
-                ></BaseButton>
-              )}
-              keyExtractor={(item) => item}
-              ItemSeparatorComponent={() => (
-                <StyledView className="w-full h-2" />
-              )}
-            ></DefaultFlatList>
-          </DefaultScrollView>
+        <StyledView>
+          <ColorSelector value={color} onChange={(value) => setColor(value)} />
         </StyledView>
-
-        <StyledView className="gap-y-2">
-          <StyledText className="text-base">Choose Icon</StyledText>
-          <DefaultScrollView horizontal>
-            <DefaultFlatList
-              data={CategoryIconKey}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              columnWrapperStyle={styles.flatListColumn}
-              numColumns={6}
-              renderItem={({ item }) => (
-                <BaseButton
-                  className={[
-                    color,
-                    "p-2 rounded-md",
-                    icon === item && "border-1 border-black border-solid",
-                  ].join(" ")}
-                  onPress={() => setIcon(item)}
-                >
-                  {CategoryIcon[item]({ size: 32 })}
-                </BaseButton>
-              )}
-              keyExtractor={(item) => item}
-              ItemSeparatorComponent={() => (
-                <StyledView className="w-full h-2" />
-              )}
-            ></DefaultFlatList>
-          </DefaultScrollView>
+        <StyledView>
+          <IconSelector
+            value={icon}
+            onChange={(value) => setIcon(value)}
+            color={color}
+          />
         </StyledView>
-
         <Button onPress={onSave}>Save</Button>
       </DefaultScrollView>
     </DefaultLayout>

@@ -13,6 +13,8 @@ import {
   CATEGORY_SCREEN_VIEW_ROUTE,
   HOME_SCREEN_PARAMS,
   HOME_SCREEN_ROUTE,
+  MUTATION_CREATE_SCREEN_PARAMS,
+  MUTATION_CREATE_SCREEN_ROUTE,
   MUTATION_SCREEN_PARAMS,
   MUTATION_SCREEN_ROUTE,
   PROFILE_SCREEN_PARAMS,
@@ -39,6 +41,7 @@ import SignIn from "./src/screens/sign-in";
 import SignUp from "./src/screens/sign-up";
 import CategoryCreate from "./src/screens/category/create";
 import CategoryView from "./src/screens/category/view";
+import MutationCreate from "./src/screens/mutation/create";
 
 export type ParamsList = {
   [SIGN_IN_SCREEN_ROUTE]: SIGN_IN_SCREEN_PARAMS;
@@ -50,6 +53,7 @@ export type ParamsList = {
   [MUTATION_SCREEN_ROUTE]: MUTATION_SCREEN_PARAMS;
   [PROFILE_SCREEN_ROUTE]: PROFILE_SCREEN_PARAMS;
 
+  [MUTATION_CREATE_SCREEN_ROUTE]: MUTATION_CREATE_SCREEN_PARAMS;
   [CATEGORY_SCREEN_VIEW_ROUTE]: CATEGORY_SCREEN_VIEW_PARAMS;
   [CATEGORY_SCREEN_CREATE_ROUTE]: CATEGORY_SCREEN_CREATE_PARAMS;
 };
@@ -185,6 +189,10 @@ export default function Route() {
             <Stack.Screen
               name={CATEGORY_SCREEN_VIEW_ROUTE}
               component={CategoryView}
+            />
+            <Stack.Screen
+              name={MUTATION_CREATE_SCREEN_ROUTE}
+              component={MutationCreate}
             />
           </>
         ) : (

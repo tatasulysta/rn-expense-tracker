@@ -26,8 +26,9 @@ export type UserCreateInput = {
 
 export type WalletCreateInput = {
   date: Date;
-  balance: number;
   userId: string;
+  income?: number;
+  expense?: number;
 };
 
 export type CategoryCreateInput = {
@@ -45,6 +46,7 @@ export type MutationCreateInput = {
   categoryId: string;
   description?: string;
   rate: number;
+  amount: number;
   rateFrom: string;
   rateTo: string;
 };
@@ -69,8 +71,10 @@ export class User extends Realm.Object {
 
 export class Wallet extends Realm.Object {
   _id = new Realm.BSON.ObjectId();
-  balance!: number;
+  income?: number;
+  expense?: number;
   createdAt = new Date();
+  date!: Date;
   userId!: string;
 
   static primaryKey = "_id";
@@ -78,6 +82,8 @@ export class Wallet extends Realm.Object {
     super(realm, {
       _id: new Realm.BSON.ObjectId(),
       ...params,
+      income: params.income || 0,
+      expense: params.expense || 0,
     });
   }
 }
@@ -106,6 +112,7 @@ export class Mutation extends Realm.Object {
   rate!: number;
   rateFrom!: string;
   rateTo!: string;
+  amount!: number;
 
   static primaryKey = "_id";
   constructor(realm: Realm, params: MutationCreateInput) {
@@ -121,7 +128,7 @@ export const userConfig = {
 
 export const walletConfig = {
   schema: [Wallet],
-  schemaVersion: 1,
+  schemaVersion: 3,
   path: "wallet.realm",
 };
 
@@ -133,6 +140,6 @@ export const categoryConfig = {
 
 export const mutationConfig = {
   schema: [Mutation],
-  schemaVersion: 2,
+  schemaVersion: 1,
   path: "mutation.realm",
 };

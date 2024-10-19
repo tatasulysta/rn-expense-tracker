@@ -4,6 +4,14 @@ export type HOME_SCREEN_PARAMS = undefined;
 export const MUTATION_SCREEN_ROUTE = "MutationScreen";
 export type MUTATION_SCREEN_PARAMS = undefined;
 
+export const MUTATION_CREATE_SCREEN_ROUTE = "MutationCreateScreen";
+export type MUTATION_CREATE_SCREEN_PARAMS = undefined;
+
+export const MUTATION_VIEW_SCREEN_ROUTE = "MutationViewScreen";
+export type MUTATION_VIEW_SCREEN_PARAMS = {
+  id: string;
+};
+
 export const CATEGORY_SCREEN_ROUTE = "CategoryScreen";
 export type CATEGORY_SCREEN_PARAMS = undefined;
 
