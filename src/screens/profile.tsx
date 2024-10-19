@@ -5,6 +5,7 @@ import { useCredential } from "../hooks/use-credential";
 import Button from "../components/elements/button";
 import { useNavigation } from "../hooks/use-navigation";
 import { SIGN_IN_SCREEN_ROUTE } from "../../router-type";
+import DefaultLayout from "../components/layout/default-layout";
 
 export default function ProfileScreen() {
   const { user } = useRealm();
@@ -30,11 +31,11 @@ export default function ProfileScreen() {
     });
   };
   return (
-    <StyledView>
-      <StyledText>hehe</StyledText>
-      <Button onPress={() => deleteUserById()} className="text-white">
-        Delete sMe
+    <DefaultLayout className=" gap-2 ">
+      <Button onPress={() => deleteUserById()}>Delete Me</Button>
+      <Button onPress={() => setCredential({ user: undefined })}>
+        Sign Out
       </Button>
-    </StyledView>
+    </DefaultLayout>
   );
 }
