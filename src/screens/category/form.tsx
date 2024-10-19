@@ -4,29 +4,22 @@ import { StyledText, StyledView } from "../../components/common";
 import TextInput from "../../components/elements/input/text-input";
 import { CategoryColor, CategoryIcon, CategoryIconKey } from "./helper";
 // import { useCredential } from "../../hooks/use-credential";
-import DefaultFlatList from "../../components/common/flat-list";
-import Button, { BaseButton } from "../../components/elements/button";
+import Button from "../../components/elements/button";
 import { useCredential } from "../../hooks/use-credential";
-import {
-  Category,
-  CategoryCreateInput,
-  CategoryType,
-  UserTypeEnum,
-} from "../../store/auth.schema";
+import { Category, CategoryType, UserTypeEnum } from "../../store/auth.schema";
 import { useRealm } from "../../hooks/use-realm";
 import DefaultScrollView from "../../components/common/scroll-view";
 import { StyleSheet } from "react-native";
 import * as Yup from "yup";
 
 import { useNavigation } from "../../hooks/use-navigation";
-import { MUTATION_SCREEN_ROUTE } from "../../../router-type";
-import { useForm } from "react-hook-form";
+import { HOME_SCREEN_ROUTE } from "../../../router-type";
 import ColorSelector from "./components/color-selector";
 import IconSelector from "./components/icon-selector";
 import UserSelectInput from "../components/user-state-select-input";
 import Header from "../../components/widgets/header";
 interface Props {
-  category?: Category;
+  id?: string;
 }
 
 const validation = (isAdmin: boolean) =>
@@ -40,14 +33,20 @@ const validation = (isAdmin: boolean) =>
   });
 
 export default function CategoryForm(props: Props) {
-  const { category } = props;
+  const { id } = props;
   const { credential } = useCredential();
   const { navigate } = useNavigation();
   const realm = useRealm();
-  const [color, setColor] = React.useState<string>(CategoryColor[0]);
-  const [icon, setIcon] = React.useState<string>(CategoryIconKey[0]);
+  const category = realm.category!.objectForPrimaryKey("Category", props.id);
+  const _category = category as unknown as Category | undefined;
+  const [color, setColor] = React.useState<string>(
+    _category?.color || CategoryColor[0],
+  );
+  const [icon, setIcon] = React.useState<string>(
+    _category?.icon || CategoryIconKey[0],
+  );
 
-  const [label, setLabel] = React.useState<string>("");
+  const [label, setLabel] = React.useState<string>(_category?.label || "");
   const [userId, setUserId] = React.useState<string>("");
 
   const isAdmin = credential?.user?.type === UserTypeEnum.Admin;
@@ -61,11 +60,11 @@ export default function CategoryForm(props: Props) {
 
     try {
       await validation(isAdmin).validate(values);
-      if (category) {
+      if (id) {
         realm.category!.write(() => {
-          category.color = color;
-          category.label = label;
-          category.icon = icon;
+          category!.color = color;
+          category!.label = label;
+          category!.icon = icon;
         });
       } else
         realm.category!.write(() => {
@@ -77,7 +76,7 @@ export default function CategoryForm(props: Props) {
             userId: isAdmin ? userId : credential?.user?._id.toString(),
           });
         });
-      navigate(MUTATION_SCREEN_ROUTE);
+      navigate(HOME_SCREEN_ROUTE);
     } catch (e) {
       console.log(e);
     }
@@ -85,16 +84,13 @@ export default function CategoryForm(props: Props) {
 
   return (
     <DefaultLayout
-      header={<Header title={`${category ? "Edit" : "New"} Category`} />}
+      header={<Header title={`${id ? "Edit" : "New"} Category`} />}
     >
       <DefaultScrollView className="flex flex-1 gap-6">
         {/* PREVIEW */}
-        <StyledView className="flex-1 flex flex-grow-0 max-w-60">
+        <StyledView className="flex-1 flex justify-center max-w-60 ">
           <StyledView
-            className={[
-              color,
-              "flex-grow-0 self-center p-2 items-center rounded-lg",
-            ].join(" ")}
+            className={`flex-grow-0 self-center p-2 items-center rounded-lg ${color}`}
           >
             {CategoryIcon[icon]({ size: 50 })}
             <StyledText className="text-base max-w-fit text-center text-ellipsis text-nowrap">

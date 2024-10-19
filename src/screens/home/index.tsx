@@ -6,7 +6,7 @@ import { StyledText, StyledView } from "../../components/common";
 import DefaultLayout from "../../components/layout/default-layout";
 import DefaultScrollView from "../../components/common/scroll-view";
 import WalletDetail from "./components/wallet-detail";
-import { BaseButton } from "../../components/elements/button";
+import Button, { BaseButton } from "../../components/elements/button";
 import { PencilIcon } from "../../assets";
 import { useNavigation } from "../../hooks/use-navigation";
 import { MUTATION_CREATE_SCREEN_ROUTE } from "../../../router-type";
@@ -41,11 +41,8 @@ function FAB() {
   );
 }
 export default function Home() {
-  const realm = useRealm();
-  const { credential } = useCredential();
-
   return (
-    <DefaultLayout className="relative">
+    <DefaultLayout className="relative ">
       <DefaultScrollView contentContainerStyle={{ gap: 20 }}>
         <GraphSection />
         <CategorySection />

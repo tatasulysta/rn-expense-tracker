@@ -112,14 +112,14 @@ export default function SpendingChart() {
       <StyledView className="flex flex-1">
         {Object.keys(mutationGroup.category.datas).map((categoryKey) => (
           <StyledText>
-            {`${categoryKey.split("|")[0]} ${
+            {`${categoryKey.split("|")[0]} ${(
               (mutationGroup.category.datas[categoryKey].reduce(
                 (prev, cur) => prev + cur.amount,
                 0,
               ) /
                 mutationGroup.category.total) *
               100
-            }%`}
+            ).toFixed(2)}%`}
           </StyledText>
         ))}
       </StyledView>

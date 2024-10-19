@@ -49,7 +49,6 @@ export default function GraphMonth() {
   }, [realm.wallet, startOfMonth]);
 
   const datas = Object.keys(mutationGroup[type].datas);
-  console.log(datas, "HDHDHDHH");
   return (
     <StyledView className="gap-y-3">
       <StyledView>

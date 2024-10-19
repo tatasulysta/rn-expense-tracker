@@ -6,48 +6,49 @@ import { CategoryColor, CategoryIcon } from "./helper";
 import Button, { BaseButton } from "../../components/elements/button";
 import TextInput from "../../components/elements/input/text-input";
 import DefaultLayout from "../../components/layout/default-layout";
+import Header from "../../components/widgets/header";
+import DefaultScrollView from "../../components/common/scroll-view";
+import useGetCategoryList from "../../hooks/use-get-category-list";
+import CategoryButton from "../components/category";
+import { useNavigation } from "../../hooks/use-navigation";
+import {
+  CATEGORY_SCREEN_CREATE_ROUTE,
+  CATEGORY_SCREEN_VIEW_ROUTE,
+} from "../../../router-type";
 
-const CategroyIconKey = Object.keys(CategoryIcon);
 export default function CategoryScreen() {
-  const [color, setColor] = React.useState<string>();
-  // const { credential } = useCredential();
-
-  const titleRef = React.useRef("");
-
-  const onSaveCategory = () => {};
+  const { categories } = useGetCategoryList();
+  const { navigate } = useNavigation();
 
   return (
-    <DefaultLayout>
-      <StyledText className="text-blue-100"> New Category</StyledText>
-      <TextInput
-        placeholder="Category Title"
-        type="text"
-        onChangeText={(text) => (titleRef.current = text)}
-      />
-      <DefaultFlatList
-        data={CategoryColor}
-        renderItem={({ item }) => (
-          <BaseButton
-            className={[item, "p-2"].join(" ")}
-            style={{ width: 20, height: 20 }}
-          >
-            {CategoryIcon[item]({ size: 24 })}
-          </BaseButton>
-        )}
-        keyExtractor={(item) => item}
-      />
-      <DefaultFlatList
-        data={CategroyIconKey}
-        numColumns={4}
-        renderItem={({ item }) => (
-          <BaseButton className={[color, "p-2"].join(" ")}>
-            {CategoryIcon[item]({ size: 24 })}
-          </BaseButton>
-        )}
-        keyExtractor={(item) => item}
-      />
-
-      <Button onPress={onSaveCategory}>Save</Button>
+    <DefaultLayout header={<Header title={"Category"} />}>
+      <DefaultScrollView>
+        <DefaultFlatList
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          columnWrapperStyle={{ gap: 30, marginBottom: 30 }}
+          data={categories}
+          numColumns={6}
+          renderItem={({ item: category }) => (
+            <CategoryButton
+              key={`${category._id}`}
+              color={category.color}
+              icon={category.icon}
+              label={category.label}
+              onPress={() =>
+                navigate(CATEGORY_SCREEN_VIEW_ROUTE, {
+                  id: category._id as any,
+                })
+              }
+            />
+          )}
+          keyExtractor={(item) => item}
+          ItemSeparatorComponent={() => <StyledView className="w-full h-2" />}
+        ></DefaultFlatList>
+        <Button onPress={() => navigate(CATEGORY_SCREEN_CREATE_ROUTE)}>
+          Add New Category
+        </Button>
+      </DefaultScrollView>
     </DefaultLayout>
   );
 }

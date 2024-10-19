@@ -30,7 +30,7 @@ import CategorySelectInput from "../../components/category-select-input";
 import { resetTime } from "../../../utils/date";
 
 interface Props {
-  mutation?: Mutation;
+  id?: string;
 }
 
 type FormType = Omit<MutationCreateInput, "userId" | "rate" | "rateFrom"> & {
@@ -64,42 +64,37 @@ const typeSelectOptions: SelectInputOption[] = [
 ];
 
 export default function MutationForm(props: Props) {
-  const { mutation } = props;
+  const { id } = props;
   const { navigate } = useNavigation();
   const { credential } = useCredential();
   const realm = useRealm();
+  const mutation = id
+    ? realm.mutation!.objectForPrimaryKey("Mutation", props.id)
+    : undefined;
+  const _mutation = mutation as unknown as Mutation | undefined;
   const baseRate = credential?.user?.defaultBaseRate;
   const isAdmin = credential?.user?.type === UserTypeEnum.Admin;
   const uid = `${credential?.user?._id}`;
-
   const methods = useForm<FormType>({
     mode: "onChange",
     defaultValues: {
-      categoryId: "",
-      description: "",
-      rateTo: baseRate,
-      transactionAt: new Date(),
-      type: MutationType.Income,
-      rate: 1,
+      categoryId: _mutation?.categoryId || "",
+      description: _mutation?.description || "",
+      rateTo: _mutation?.rateTo || baseRate,
+      transactionAt: _mutation?.transactionAt || new Date(),
+      type: (_mutation?.type as any) || MutationType.Income,
+      rate: _mutation?.rate || 1,
+      amount: _mutation?.amount || 0,
+      categoryName: _mutation?.categoryName || "",
     },
     resolver: validation(isAdmin) as any,
   });
 
   const onSubmit = async (values: FormType) => {
     try {
-      await Yup.object({ categoryId: Yup.string().required() }).validate(
-        values,
-      );
-      realm.mutation!.write(() => {
-        realm.mutation?.create("Mutation", {
-          ...values,
-          amount: Number(values.amount) * (values.rate || 0),
-          rateFrom: credential?.user?.defaultBaseRate!,
-          userId: `${credential?.user?._id}`,
-        } as MutationCreateInput);
-      });
       const transactionAt = startOfMonth(resetTime(values.transactionAt));
-      const amount = Number(values.amount) || 0;
+      const _amount = Number(values.amount) || 0;
+      const amount = !!id ? _amount - (_mutation?.amount || 0) : _amount;
       const isIncome = values.type === MutationType.Income;
       realm.wallet!.write(() => {
         const walletToEdit = realm.wallet
@@ -120,8 +115,33 @@ export default function MutationForm(props: Props) {
             walletToEdit.income = (walletToEdit.income || 0) + amount;
           else walletToEdit.expense = (walletToEdit.expense || 0) + amount;
         }
-        navigate(HOME_SCREEN_ROUTE);
       });
+      if (id) {
+        realm.mutation?.write(() => {
+          const mutationToEdit = realm.mutation!.objectForPrimaryKey(
+            "Mutation",
+            id,
+          );
+          if (mutationToEdit) {
+            mutationToEdit.amount = values.amount;
+            mutationToEdit.categoryId = values.categoryId;
+            mutationToEdit.description = values.description;
+            mutationToEdit.categoryName = values.categoryName;
+            mutationToEdit.rate = values.rate;
+            mutationToEdit.rateTo = values.rateTo;
+          }
+        });
+      } else {
+        realm.mutation!.write(() => {
+          realm.mutation?.create("Mutation", {
+            ...values,
+            amount: Number(values.amount) * (values.rate || 0),
+            rateFrom: credential?.user?.defaultBaseRate!,
+            userId: `${credential?.user?._id}`,
+          } as MutationCreateInput);
+        });
+      }
+      navigate(HOME_SCREEN_ROUTE);
     } catch (e) {
       console.log(e);
     }
@@ -136,7 +156,6 @@ export default function MutationForm(props: Props) {
           contentContainerStyle={{
             gap: 20,
           }}
-          className="mt-5"
         >
           <Input
             type="select"

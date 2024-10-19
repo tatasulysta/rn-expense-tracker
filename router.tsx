@@ -15,8 +15,10 @@ import {
   HOME_SCREEN_ROUTE,
   MUTATION_CREATE_SCREEN_PARAMS,
   MUTATION_CREATE_SCREEN_ROUTE,
-  MUTATION_SCREEN_PARAMS,
-  MUTATION_SCREEN_ROUTE,
+  MUTATION_SCREEN_GROUP_PARAMS,
+  MUTATION_SCREEN_GROUP_ROUTE,
+  MUTATION_VIEW_SCREEN_PARAMS,
+  MUTATION_VIEW_SCREEN_ROUTE,
   PROFILE_SCREEN_PARAMS,
   PROFILE_SCREEN_ROUTE,
   SIGN_IN_SCREEN_PARAMS,
@@ -42,6 +44,8 @@ import SignUp from "./src/screens/sign-up";
 import CategoryCreate from "./src/screens/category/create";
 import CategoryView from "./src/screens/category/view";
 import MutationCreate from "./src/screens/mutation/create";
+import CategoryScreen from "./src/screens/category";
+import MutationView from "./src/screens/mutation/view";
 
 export type ParamsList = {
   [SIGN_IN_SCREEN_ROUTE]: SIGN_IN_SCREEN_PARAMS;
@@ -50,10 +54,11 @@ export type ParamsList = {
   Main: undefined;
   [HOME_SCREEN_ROUTE]: HOME_SCREEN_PARAMS;
   [CATEGORY_SCREEN_ROUTE]: CATEGORY_SCREEN_PARAMS;
-  [MUTATION_SCREEN_ROUTE]: MUTATION_SCREEN_PARAMS;
   [PROFILE_SCREEN_ROUTE]: PROFILE_SCREEN_PARAMS;
 
+  [MUTATION_SCREEN_GROUP_ROUTE]: MUTATION_SCREEN_GROUP_PARAMS;
   [MUTATION_CREATE_SCREEN_ROUTE]: MUTATION_CREATE_SCREEN_PARAMS;
+  [MUTATION_VIEW_SCREEN_ROUTE]: MUTATION_VIEW_SCREEN_PARAMS;
   [CATEGORY_SCREEN_VIEW_ROUTE]: CATEGORY_SCREEN_VIEW_PARAMS;
   [CATEGORY_SCREEN_CREATE_ROUTE]: CATEGORY_SCREEN_CREATE_PARAMS;
 };
@@ -89,12 +94,6 @@ const TABS: Tab[] = [
     component: Home,
     label: "Home",
     icon: HomeIcon,
-  },
-  {
-    name: MUTATION_SCREEN_ROUTE,
-    component: MutationScreen,
-    label: "Mutation",
-    icon: MutationIcon,
   },
   {
     name: PROFILE_SCREEN_ROUTE,
@@ -183,6 +182,10 @@ export default function Route() {
           <>
             <Stack.Screen name="Main" component={Main} />
             <Stack.Screen
+              name={CATEGORY_SCREEN_ROUTE}
+              component={CategoryScreen}
+            />
+            <Stack.Screen
               name={CATEGORY_SCREEN_CREATE_ROUTE}
               component={CategoryCreate}
             />
@@ -193,6 +196,14 @@ export default function Route() {
             <Stack.Screen
               name={MUTATION_CREATE_SCREEN_ROUTE}
               component={MutationCreate}
+            />
+            <Stack.Screen
+              name={MUTATION_VIEW_SCREEN_ROUTE}
+              component={MutationView}
+            />
+            <Stack.Screen
+              name={MUTATION_SCREEN_GROUP_ROUTE}
+              component={MutationScreen}
             />
           </>
         ) : (

@@ -1,8 +1,12 @@
 export const HOME_SCREEN_ROUTE = "HomeScreen";
 export type HOME_SCREEN_PARAMS = undefined;
 
-export const MUTATION_SCREEN_ROUTE = "MutationScreen";
-export type MUTATION_SCREEN_PARAMS = undefined;
+export const MUTATION_SCREEN_GROUP_ROUTE = "MutationGroupScreen";
+export type MUTATION_SCREEN_GROUP_PARAMS = {
+  startAt: Date;
+  endAt: Date;
+  userId: string;
+};
 
 export const MUTATION_CREATE_SCREEN_ROUTE = "MutationCreateScreen";
 export type MUTATION_CREATE_SCREEN_PARAMS = undefined;

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyledText } from "../../components/common";
+import { StyledText, StyledView } from "../../components/common";
 import DefaultLayout from "../../components/layout/default-layout";
 
 import DefaultScrollView from "../../components/common/scroll-view";
@@ -7,66 +7,107 @@ import { useRealm } from "../../hooks/use-realm";
 import Button, { BaseButton } from "../../components/elements/button";
 import { useNavigation } from "../../hooks/use-navigation";
 import { AddIcon } from "../../assets";
-import { CATEGORY_SCREEN_CREATE_ROUTE } from "../../../router-type";
+import {
+  MUTATION_CREATE_SCREEN_ROUTE,
+  MUTATION_SCREEN_GROUP_ROUTE,
+  MUTATION_VIEW_SCREEN_ROUTE,
+} from "../../../router-type";
 import { useCredential } from "../../hooks/use-credential";
-import { Category } from "../../store/auth.schema";
-import { CategoryIcon } from "../category/helper";
-import CategoryButton from "../components/category";
+import { StackNavigationScreenProps } from "../../../router";
+import { Mutation, MutationType } from "../../store/auth.schema";
+import { format } from "date-fns";
+import Header from "../../components/widgets/header";
+import { string2money } from "../../utils/string";
 
-export default function MutationScreen() {
+interface Props
+  extends StackNavigationScreenProps<typeof MUTATION_SCREEN_GROUP_ROUTE> {}
+export default function MutationScreen(props: Props) {
+  const {
+    route: {
+      params: { endAt, startAt, userId },
+    },
+  } = props;
   const realm = useRealm();
   const { navigate } = useNavigation();
-  const { credential } = useCredential();
-  const [categories, setCategories] = React.useState<Category[]>([]);
+  const [mutation, setMutation] = React.useState<Mutation[]>([]);
 
   React.useEffect(() => {
-    if (realm.category) {
-      const categoryData = realm.category
-        ?.objects("Category")
-        .filtered(`userId == $0`, `${credential?.user?._id}`);
+    if (realm.mutation) {
+      const mutationData = realm.mutation
+        ?.objects("Mutation")
+        .filtered(
+          `userId == $0 && transactionAt >= $1 && transactionAt <= $2`,
+          userId,
+          startAt,
+          endAt,
+        );
 
-      const _categories = (categoryData || []) as unknown as Category[];
-      setCategories([..._categories]);
+      const _mutations = (mutationData || []) as unknown as Mutation[];
+      setMutation([..._mutations]);
 
-      const listener = () => setCategories([..._categories]);
+      const listener = () => setMutation([..._mutations]);
 
-      categoryData.addListener(listener);
+      mutationData.addListener(listener);
       return () => {
-        categoryData.removeListener(listener);
+        mutationData.removeListener(listener);
       };
     }
-  }, [realm.category]);
+  }, [realm.mutation, userId, startAt, endAt]);
 
   return (
-    <DefaultLayout>
+    <DefaultLayout header={<Header title="Mutation"></Header>}>
       <DefaultScrollView className="gap-y-3">
-        <StyledText className="text-black font-medium text-base text-center">
-          Spend by Category
-        </StyledText>
-        <DefaultScrollView horizontal className="gap-4 flex-grow-0 p-4">
-          {categories.map((category, index) => (
-            <CategoryButton
-              key={index}
-              color={category.color}
-              icon={category.icon}
-              label={category.label}
-            />
+        <DefaultScrollView contentContainerStyle={{ gap: 20 }}>
+          {mutation.map((mutation, index) => (
+            <MutationButton key={mutation._id.toString()} mutation={mutation} />
           ))}
 
-          <BaseButton
-            onPress={() => navigate(CATEGORY_SCREEN_CREATE_ROUTE)}
-            className="max-w-50 w-fit flex items-center p-2"
-          >
-            <AddIcon size={32} />
+          <Button onPress={() => navigate(MUTATION_CREATE_SCREEN_ROUTE)}>
             <StyledText
               className="max-w-fit text-center text-ellipsis text-nowrap"
               numberOfLines={2}
             >
-              Add Category
+              Add New Mutation
             </StyledText>
-          </BaseButton>
+          </Button>
         </DefaultScrollView>
       </DefaultScrollView>
     </DefaultLayout>
+  );
+}
+
+function MutationButton(props: { mutation: Mutation }) {
+  const { mutation } = props;
+
+  const { navigate } = useNavigation();
+
+  return (
+    <BaseButton
+      className={`rounded-xl p-4  flex-grow-0  ${
+        mutation.type == MutationType.Expense ? "bg-green-100" : "bg-blue-100"
+      } `}
+      onPress={() =>
+        navigate(MUTATION_VIEW_SCREEN_ROUTE, {
+          id: mutation._id as any,
+        })
+      }
+    >
+      <StyledText className="text-neutral-700">
+        {`Type: ${mutation.type}`}
+      </StyledText>
+      <StyledText className="text-neutral-700">
+        {`Transaction At: ${format(mutation.transactionAt, "dd/MM/yyyy")}`}
+      </StyledText>
+      <StyledText className="text-neutral-700">
+        {`Category: ${mutation.categoryName || "-"}`}
+      </StyledText>
+      <StyledText className="text-neutral-700 font-semibold">
+        {`Amount: ${string2money(mutation.amount) || "-"}`}
+      </StyledText>
+      <StyledText className="text-neutral-700">
+        {`Note: ${mutation.description || "-"}`}
+      </StyledText>
+      <StyledView className="flex-row flex-1 justify-between"></StyledView>
+    </BaseButton>
   );
 }

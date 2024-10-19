@@ -7,8 +7,8 @@ interface Props {
   icon: string;
   color: string;
   label: string;
-  onPress?: () => void;
   isActive?: boolean;
+  onPress?: () => void;
 }
 
 export default function CategoryButton(props: Props) {

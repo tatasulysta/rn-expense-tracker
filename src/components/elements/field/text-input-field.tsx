@@ -9,7 +9,7 @@ export default function TextInputField(props: TextInputFieldProps) {
   const { name, editable: _editable, readOnly, error, ...rest } = props;
 
   const {
-    field: { onChange, ...restField },
+    field: { onChange, value, ...restField },
     fieldState,
   } = useController({ name });
 
@@ -17,6 +17,7 @@ export default function TextInputField(props: TextInputFieldProps) {
     <TextInput
       {...rest}
       {...restField}
+      value={value.toString()}
       onChangeText={(value) => onChange(value)}
       error={error || (fieldState.error && fieldState.error?.message) || ""}
     />

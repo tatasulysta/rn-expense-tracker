@@ -52,7 +52,7 @@ export default function Button(props: ButtonProps) {
           onPress();
         }
       }}
-      className={` ${className} border-1 border-black rounded-md ${
+      className={` ${className} flex border-1 border-black rounded-md ${
         isDefault ? "bg-black" : "bg-white"
       } ${isSizeDefault ? " px-5 py-4" : "p-2"} ${fill && "flex-1"}`}
     >
@@ -61,7 +61,11 @@ export default function Button(props: ButtonProps) {
         {loading ? (
           <ActivityIndicator color={"black"} />
         ) : (
-          <StyledText className={isDefault ? "text-white" : "text-black"}>
+          <StyledText
+            className={`${
+              isDefault ? "text-white" : "text-black"
+            } flex-1 text-center`}
+          >
             {children}
           </StyledText>
         )}
