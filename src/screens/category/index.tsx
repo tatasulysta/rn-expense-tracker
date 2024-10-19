@@ -35,7 +35,7 @@ export default function CategoryScreen() {
           </BaseButton>
         )}
         keyExtractor={(item) => item}
-      ></DefaultFlatList>
+      />
       <DefaultFlatList
         data={CategroyIconKey}
         numColumns={4}
@@ -45,7 +45,7 @@ export default function CategoryScreen() {
           </BaseButton>
         )}
         keyExtractor={(item) => item}
-      ></DefaultFlatList>
+      />
 
       <Button onPress={onSaveCategory}>Save</Button>
     </DefaultLayout>

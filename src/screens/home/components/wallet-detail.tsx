@@ -4,6 +4,7 @@ import { BaseButton } from "../../../components/elements/button";
 import { StyledText, StyledView } from "../../../components/common";
 import { useCredential } from "../../../hooks/use-credential";
 import { endOfMonth, format } from "date-fns";
+import { string2money } from "../../../utils/string";
 
 interface Props {
   wallet: Wallet;
@@ -25,7 +26,7 @@ function WalletText({
           "text-base font-medium",
           amount < 0 ? "text-red-500" : "text-green-500",
         ].join(" ")}
-      >{`${currency} ${amount}`}</StyledText>
+      >{`${currency} ${string2money(amount)}`}</StyledText>
       <StyledText className="text-sm text-neutral-700 underline">
         {label}
       </StyledText>

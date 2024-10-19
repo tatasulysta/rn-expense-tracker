@@ -44,6 +44,7 @@ export type MutationCreateInput = {
   transactionAt: Date;
   userId: string;
   categoryId: string;
+  categoryName: string;
   description?: string;
   rate: number;
   amount: number;
@@ -108,6 +109,7 @@ export class Mutation extends Realm.Object {
   transactionAt!: Date;
   userId!: string;
   categoryId!: string;
+  categoryName!: string;
   description?: string;
   rate!: number;
   rateFrom!: string;
@@ -140,6 +142,6 @@ export const categoryConfig = {
 
 export const mutationConfig = {
   schema: [Mutation],
-  schemaVersion: 1,
+  schemaVersion: 2,
   path: "mutation.realm",
 };

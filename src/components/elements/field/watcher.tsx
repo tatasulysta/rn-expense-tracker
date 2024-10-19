@@ -6,6 +6,5 @@ interface Props {
 }
 export default function FieldWatcher(props: Props) {
   const values = useWatch({ name: props.name });
-  console.log(values);
   return props.children(values);
 }

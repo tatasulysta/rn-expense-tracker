@@ -17,17 +17,24 @@ export default function MutationScreen() {
   const realm = useRealm();
   const { navigate } = useNavigation();
   const { credential } = useCredential();
-  const [category, setCategory] = React.useState<string>("");
+  const [categories, setCategories] = React.useState<Category[]>([]);
 
-  const categories = React.useMemo<Category[]>(() => {
-    return (
-      (realm.category
+  React.useEffect(() => {
+    if (realm.category) {
+      const categoryData = realm.category
         ?.objects("Category")
-        .filtered(
-          `userId == $0`,
-          `${credential?.user?._id}`,
-        ) as unknown as Category[]) || []
-    );
+        .filtered(`userId == $0`, `${credential?.user?._id}`);
+
+      const _categories = (categoryData || []) as unknown as Category[];
+      setCategories([..._categories]);
+
+      const listener = () => setCategories([..._categories]);
+
+      categoryData.addListener(listener);
+      return () => {
+        categoryData.removeListener(listener);
+      };
+    }
   }, [realm.category]);
 
   return (
@@ -36,10 +43,7 @@ export default function MutationScreen() {
         <StyledText className="text-black font-medium text-base text-center">
           Spend by Category
         </StyledText>
-        <DefaultScrollView
-          horizontal
-          className="gap-4 flex-grow-0 p-4 bg-white"
-        >
+        <DefaultScrollView horizontal className="gap-4 flex-grow-0 p-4">
           {categories.map((category, index) => (
             <CategoryButton
               key={index}

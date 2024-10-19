@@ -39,13 +39,18 @@ const resolver = yupResolver<FormType>(
 export default function SignIn() {
   const realm = useRealm();
   const { navigate, reset } = useNavigation();
-  const { setCredential } = useCredential();
-
+  const { setCredential, credential } = useCredential();
   const goToMain = () =>
     reset({
       index: 0,
       routes: [{ name: "Main" }],
     });
+
+  React.useEffect(() => {
+    if (credential?.user?._id) {
+      goToMain();
+    }
+  }, [credential?.user?._id]);
 
   const methods = useForm<FormType>({
     mode: "onChange",
@@ -59,7 +64,6 @@ export default function SignIn() {
       const user = realm
         .user!.objects("User")
         .filtered(`email = "${values.email}"`)[0];
-      console.log(realm.user?.objects("User"));
       if (user) {
         const isValidPassword = values.password === user.password;
         if (isValidPassword) {

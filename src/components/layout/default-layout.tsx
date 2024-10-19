@@ -6,17 +6,14 @@ interface Props extends React.PropsWithChildren {
   className?: string;
   header?: React.ReactNode;
 }
+
 export default function DefaultLayout(props: Props) {
   return (
-    <>
-      <SafeAreaView>
+    <StyledView className={`flex-1 px-2 ${props.className} bg-white relative`}>
+      <SafeAreaView style={{ flex: 1 }}>
         {props.header}
-        <StyledView
-          className={`w-full px-4 h-full ${props.className} bg-white`}
-        >
-          {props.children}
-        </StyledView>
+        {props.children}
       </SafeAreaView>
-    </>
+    </StyledView>
   );
 }

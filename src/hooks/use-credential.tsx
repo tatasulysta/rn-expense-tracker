@@ -34,7 +34,6 @@ export default function Credential(props: Props) {
     () => ({
       credential: userCredential,
       setCredential: async (credential) => {
-        console.log("CREDENTIAL", credential);
         if (!credential) {
           await localStorage.removeItem(LOCAL_STORAGE_KEY.credential);
           setUserCredential(undefined);

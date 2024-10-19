@@ -74,7 +74,7 @@ export default function CategoryForm(props: Props) {
             icon,
             label: label,
             type: CategoryType.Personal,
-            userId: isAdmin ? userId : `${credential?.user?._id}`,
+            userId: isAdmin ? userId : credential?.user?._id.toString(),
           });
         });
       navigate(MUTATION_SCREEN_ROUTE);

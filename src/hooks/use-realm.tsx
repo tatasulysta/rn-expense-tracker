@@ -8,7 +8,7 @@ import {
   walletConfig,
 } from "../store/auth.schema";
 
-interface RealmState {
+export interface RealmState {
   user: null | Realm;
   category: null | Realm;
   mutation: null | Realm;

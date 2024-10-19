@@ -5,6 +5,7 @@ import Credential, { CredentialModel } from "./src/hooks/use-credential";
 import React from "react";
 import { DrawerProvider } from "./src/hooks/use-drawer";
 import { RealmProvider } from "./src/hooks/use-realm";
+import { LOCAL_STORAGE_KEY } from "./src/utils/constants";
 
 function App() {
   const [persistState, setPersistState] = React.useState<CredentialModel>({
@@ -14,7 +15,9 @@ function App() {
 
   React.useEffect(() => {
     async function exec() {
-      const credential = (await localStorage.getItem("credential")) as any;
+      const credential = (await localStorage.getItem(
+        LOCAL_STORAGE_KEY.credential,
+      )) as any;
       setPersistState({
         user: credential ? JSON.parse(credential) : undefined,
         isLoading: false,

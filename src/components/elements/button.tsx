@@ -52,11 +52,11 @@ export default function Button(props: ButtonProps) {
           onPress();
         }
       }}
-      className={`${className} flex flex-row justify-center border-2 border-black rounded-md gap-y-2 ${
+      className={` ${className} border-1 border-black rounded-md ${
         isDefault ? "bg-black" : "bg-white"
-      } ${isSizeDefault ? "px-5 py-4" : "p-2"} ${fill && "flex-1"}`}
+      } ${isSizeDefault ? " px-5 py-4" : "p-2"} ${fill && "flex-1"}`}
     >
-      <>
+      <StyledView className="gap-x-2 flex flex-row">
         {left?.(isSizeDefault ? 22 : 18)}
         {loading ? (
           <ActivityIndicator color={"black"} />
@@ -66,7 +66,7 @@ export default function Button(props: ButtonProps) {
           </StyledText>
         )}
         {right?.(isSizeDefault ? 22 : 18)}
-      </>
+      </StyledView>
     </BaseButton>
   );
 }
