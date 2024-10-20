@@ -37,4 +37,5 @@ export {
   Pencil as PencilIcon,
   CaretLeft as CaretLeftIcon,
   CaretRight as CaretRightIcon,
+  Trash as TrashIcon,
 } from "phosphor-react-native";

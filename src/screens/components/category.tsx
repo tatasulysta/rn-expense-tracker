@@ -16,7 +16,7 @@ export default function CategoryButton(props: Props) {
     <BaseButton
       className={`${
         props.color
-      } p-2 flex-grow-0 self-start max-w-60 items-center rounded-lg ${
+      } p-2 flex-grow-0  max-w-60 items-center rounded-lg ${
         props.isActive && "border-1 border-black border-solid"
       }`}
       onPress={props.onPress}
