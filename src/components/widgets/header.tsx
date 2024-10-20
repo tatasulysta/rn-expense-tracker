@@ -26,7 +26,7 @@ const AnimatedView = Animated.View;
 
 export default function Header(props: Props) {
   const [width, setWidth] = React.useState<number | undefined>();
-  const { back, title, onBackPress } = props;
+  const { back = true, title, onBackPress } = props;
 
   const { goBack, canGoBack } = useNavigation();
 
@@ -49,7 +49,7 @@ export default function Header(props: Props) {
   return (
     <AnimatedView style={StyleSheet.flatten([styles.wrapper])}>
       <AnimatedView style={[styles.container, { paddingHorizontal: 16 }]}>
-        {!back && (
+        {back && (
           <View onLayout={onLayout}>
             <Button
               size="small"

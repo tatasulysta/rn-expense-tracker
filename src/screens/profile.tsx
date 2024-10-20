@@ -8,6 +8,7 @@ import { SIGN_IN_SCREEN_ROUTE } from "../../router-type";
 import DefaultLayout from "../components/layout/default-layout";
 import TextInfo from "../components/common/text-info";
 import { toast } from "../utils/notification";
+import Header from "../components/widgets/header";
 
 export default function ProfileScreen() {
   const { user, category, wallet, mutation } = useRealm();
@@ -49,10 +50,29 @@ export default function ProfileScreen() {
     });
   };
   return (
-    <DefaultLayout className=" gap-2 ">
-      <Button onPress={() => deleteUserById()}>Delete My Account</Button>
-      <TextInfo>Deleting your account will wipe all the mutation data</TextInfo>
-      <Button onPress={() => setCredential(undefined)}>Sign Out</Button>
+    <DefaultLayout
+      className=" gap-2 "
+      header={<Header back={false} title="Profile" />}
+    >
+      <StyledView className="mb-5 flex-1">
+        <StyledText className="text-xl text-center">
+          You currently logged in as
+        </StyledText>
+        <StyledText className="text-lg text-center">
+          {credential?.user?.email}
+        </StyledText>
+      </StyledView>
+      <StyledView className="gap-y-4">
+        <Button onPress={() => setCredential(undefined)}>Sign Out</Button>
+        <StyledView>
+          <Button variant="outlined" onPress={() => deleteUserById()}>
+            Delete My Account
+          </Button>
+          <TextInfo>
+            Deleting your account will wipe all the mutation data
+          </TextInfo>
+        </StyledView>
+      </StyledView>
     </DefaultLayout>
   );
 }
