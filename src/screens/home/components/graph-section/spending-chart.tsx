@@ -3,7 +3,7 @@ import { useRealm } from "../../../../hooks/use-realm";
 import { useCredential } from "../../../../hooks/use-credential";
 import useMonthSelect from "../../utils/use-month-select";
 import { resetTime } from "../../../../utils/date";
-import { endOfMonth } from "date-fns";
+import { endOfMonth, endOfYear, format } from "date-fns";
 import { Mutation, UserTypeEnum } from "../../../../store/auth.schema";
 import { useBreakdownMutationByDate } from "../../utils/use-breakdown-mutation";
 import useYearSelect from "../../utils/use-year-select";
@@ -31,32 +31,19 @@ export default function SpendingChart() {
 
   React.useEffect(() => {
     if (realm.mutation) {
-      // if (type === "weekly") {
       const _startOfMonth = resetTime(new Date(startOfMonth));
-
+      const isWeekly = type === "weekly";
       const eom = resetTime(endOfMonth(_startOfMonth));
+      const foy = new Date(year);
+      const eoy = resetTime(endOfYear(foy));
       const mutationData = realm.mutation
         ?.objects("Mutation")
         .filtered(
           "userId == $0 && transactionAt >= $1 && transactionAt <= $2",
           userId,
-          _startOfMonth,
-          eom,
+          isWeekly ? _startOfMonth : foy,
+          isWeekly ? eom : eoy,
         );
-
-      // } else {
-      //   console.log("re-trigger", userId);
-
-      //   const foy = new Date(year);
-      //   const eoy = resetTime(endOfYear(foy));
-      //   mutationData.filtered(
-      //     `userId == $0 && transactionAt >= $1 && transactionAt <= $2`,
-      //     userId,
-      //     foy,
-      //     eoy,
-      //   );
-      // }
-
       const _wallets = (mutationData || []) as unknown as Mutation[];
       setMutations([..._wallets]);
 
@@ -99,6 +86,18 @@ export default function SpendingChart() {
           </Badge>
         </StyledView>
       </StyledView>
+      {type === "weekly" && (
+        <StyledView>
+          {mutationGroup.weekGroup.map((week, index) => (
+            <StyledText key={`week-detail-${index}`} className="text-xs">
+              {`Week ${index + 1}: ${format(
+                week.start,
+                "dd/MM/yyyy",
+              )} - ${format(week.end, "dd/MM/yyyy")}`}
+            </StyledText>
+          ))}
+        </StyledView>
+      )}
       <DefaultScrollView horizontal>
         <LineChart
           data={{
@@ -112,11 +111,11 @@ export default function SpendingChart() {
                   ? mutationGroup.group
                   : mutationGroup.groupWeek
                 ).map((m) => m.total),
-                color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
-                strokeWidth: 2, // optional
+                color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
+                strokeWidth: 2,
               },
             ],
-            legend: ["Spending"], // optional
+            legend: ["Spending"],
           }}
           width={Dimensions.get("window").width}
           bezier
@@ -124,6 +123,7 @@ export default function SpendingChart() {
           chartConfig={GRAPH_CONFIG}
         />
       </DefaultScrollView>
+
       <StyledView className="flex flex-1">
         {Object.keys(mutationGroup.category.datas).map((categoryKey) => (
           <StyledText>

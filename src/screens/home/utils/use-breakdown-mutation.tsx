@@ -3,8 +3,10 @@ import { Mutation, MutationType } from "../../../store/auth.schema";
 import { resetTime } from "../../../utils/date";
 import {
   addDays,
+  addWeeks,
   endOfDay,
   endOfMonth,
+  endOfWeek,
   format,
   startOfDay,
   startOfMonth,
@@ -28,15 +30,21 @@ export const generateMonthRange = (year: number) => {
 };
 
 function generateWeekRange(year, month) {
-  const firstDayOfMonth = startOfMonth(new Date(year, month - 1, 1));
+  let currentDate = startOfMonth(new Date(year, month));
 
-  const firstMonday = startOfWeek(firstDayOfMonth, { weekStartsOn: 1 });
+  const weekRanges: { start: Date; end: Date }[] = [];
 
-  const startOfWeekDate = addDays(firstMonday, 7);
+  for (let i = 0; i < 4; i++) {
+    const startOfCurrentWeek = startOfWeek(currentDate, { weekStartsOn: 1 });
+    const endOfCurrentWeek = endOfWeek(currentDate, { weekStartsOn: 1 });
+    weekRanges.push({
+      start: startOfCurrentWeek,
+      end: endOfCurrentWeek,
+    });
+    currentDate = addWeeks(currentDate, 1);
+  }
 
-  return Array(7)
-    .fill("")
-    .map((_, i) => addDays(startOfWeekDate, i));
+  return weekRanges;
 }
 
 const groupByCategory = (mutations: Mutation[]) => {
@@ -70,6 +78,10 @@ export function useBreakdownMutationByDate({
 }) {
   const mutationGroup = React.useMemo(() => {
     const template = generateMonthRange(year);
+    const weekTemplate = generateWeekRange(
+      weekly.getFullYear(),
+      weekly.getMonth(),
+    );
     const groupYear: {
       label: string;
       data: Mutation[];
@@ -79,17 +91,17 @@ export function useBreakdownMutationByDate({
       label: string;
       total: number;
     }[] = [];
-    generateWeekRange(weekly.getFullYear(), weekly.getMonth()).forEach(
-      (day) => {
-        const data = mutations.filter(
-          (mutation) => mutation.transactionAt === day,
-        );
-        groupWeek.push({
-          label: format(day, "E"),
-          total: data.reduce((prev, cur) => prev + cur.amount, 0),
-        });
-      },
-    );
+    weekTemplate.forEach((week, index) => {
+      const data = mutations.filter(
+        (mutation) =>
+          mutation.transactionAt >= week.start &&
+          mutation.transactionAt <= week.end,
+      );
+      groupWeek.push({
+        label: `week-${index + 1}`,
+        total: data.reduce((prev, cur) => prev + cur.amount, 0),
+      });
+    });
 
     template.forEach((value) => {
       const data = mutations.filter(
@@ -107,6 +119,7 @@ export function useBreakdownMutationByDate({
       group: groupYear,
       category: groupByCategory(mutations),
       groupWeek,
+      weekGroup: weekTemplate,
     };
   }, [year, weekly]);
   return { mutationGroup };
