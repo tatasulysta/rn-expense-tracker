@@ -3,7 +3,7 @@ import { Category } from "../store/auth.schema";
 import { useRealm } from "./use-realm";
 import { useCredential } from "./use-credential";
 
-export default function useGetCategoryList() {
+export default function useGetCategoryList(props?: { userId: string }) {
   const realm = useRealm();
 
   const { credential } = useCredential();
@@ -14,7 +14,7 @@ export default function useGetCategoryList() {
     if (realm.category) {
       const categoryData = realm.category
         ?.objects("Category")
-        .filtered(`userId == $0`, `${credential?.user?._id}`);
+        .filtered(`userId == $0`, props?.userId || `${credential?.user?._id}`);
 
       const _categories = (categoryData || []) as unknown as Category[];
       setCategories([..._categories]);
@@ -26,7 +26,7 @@ export default function useGetCategoryList() {
         categoryData.removeListener(listener);
       };
     }
-  }, [realm.category]);
+  }, [realm.category, props?.userId]);
 
   return { categories };
 }

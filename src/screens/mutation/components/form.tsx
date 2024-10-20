@@ -28,6 +28,8 @@ import { startOfMonth } from "date-fns";
 import { HOME_SCREEN_ROUTE } from "../../../../router-type";
 import CategorySelectInput from "../../components/category-select-input";
 import { resetTime } from "../../../utils/date";
+import UserSelectInput from "../../components/user-select-input";
+import { EyedropperSample } from "phosphor-react-native";
 
 interface Props {
   id?: string;
@@ -35,10 +37,11 @@ interface Props {
 
 type FormType = Omit<MutationCreateInput, "userId" | "rate" | "rateFrom"> & {
   rate?: number;
+  userId?: string;
 };
 
-const validation = (isAdmin) =>
-  yupResolver<Omit<FormType, "categoryName">>(
+const validation = () =>
+  yupResolver<Omit<FormType, "categoryName" | "userId">>(
     Yup.object({
       type: Yup.string()
         .required()
@@ -74,7 +77,7 @@ export default function MutationForm(props: Props) {
   const _mutation = mutation as unknown as Mutation | undefined;
   const baseRate = credential?.user?.defaultBaseRate;
   const isAdmin = credential?.user?.type === UserTypeEnum.Admin;
-  const uid = `${credential?.user?._id}`;
+
   const methods = useForm<FormType>({
     mode: "onChange",
     defaultValues: {
@@ -86,62 +89,82 @@ export default function MutationForm(props: Props) {
       rate: _mutation?.rate || 1,
       amount: _mutation?.amount || 0,
       categoryName: _mutation?.categoryName || "",
+      userId: `${credential?.user?._id}`,
     },
-    resolver: validation(isAdmin) as any,
+    resolver: validation() as any,
   });
 
   const onSubmit = async (values: FormType) => {
     try {
+      if (!id && isAdmin) {
+        await Yup.object({ userId: Yup.string().required() }).validate(values);
+      }
+
       const transactionAt = startOfMonth(resetTime(values.transactionAt));
-      const _amount = Number(values.amount) || 0;
-      const amount = !!id ? _amount - (_mutation?.amount || 0) : _amount;
+      const amount = Number(values.amount) || 0;
       const isIncome = values.type === MutationType.Income;
+
       realm.wallet!.write(() => {
         const walletToEdit = realm.wallet
           ?.objects("Wallet")
           .filtered(
             "userId==$0 && date==$1",
-            uid,
+            values.userId,
             transactionAt,
           )[0] as unknown as Wallet;
+
         if (!walletToEdit) {
           realm.wallet?.create("Wallet", {
             date: transactionAt,
-            userId: uid,
+            userId: values.userId,
             ...(isIncome ? { income: amount } : { expense: amount }),
           } as WalletCreateInput);
         } else {
-          if (isIncome)
-            walletToEdit.income = (walletToEdit.income || 0) + amount;
-          else walletToEdit.expense = (walletToEdit.expense || 0) + amount;
+          const before = {
+            income:
+              (_mutation?.type === MutationType.Income
+                ? _mutation?.amount
+                : 0) || 0,
+            expense:
+              (_mutation?.type === MutationType.Expense
+                ? _mutation?.amount
+                : 0) || 0,
+          };
+          if (isIncome) {
+            walletToEdit.income =
+              (walletToEdit.income || 0) - before.income + amount;
+            walletToEdit.expense = (walletToEdit.expense || 0) - before.expense;
+          } else {
+            walletToEdit.income = (walletToEdit.income || 0) - before.income;
+            walletToEdit.expense = (walletToEdit.expense || 0) + amount;
+          }
         }
       });
-      if (id) {
-        realm.mutation?.write(() => {
-          const mutationToEdit = realm.mutation!.objectForPrimaryKey(
-            "Mutation",
-            id,
-          );
-          if (mutationToEdit) {
-            mutationToEdit.amount = values.amount;
-            mutationToEdit.categoryId = values.categoryId;
-            mutationToEdit.description = values.description;
-            mutationToEdit.categoryName = values.categoryName;
-            mutationToEdit.rate = values.rate;
-            mutationToEdit.rateTo = values.rateTo;
-          }
-        });
-      } else {
-        realm.mutation!.write(() => {
-          realm.mutation?.create("Mutation", {
-            ...values,
-            amount: Number(values.amount) * (values.rate || 0),
-            rateFrom: credential?.user?.defaultBaseRate!,
-            userId: `${credential?.user?._id}`,
-          } as MutationCreateInput);
-        });
-      }
-      navigate(HOME_SCREEN_ROUTE);
+      // if (id) {
+      //   realm.mutation?.write(() => {
+      //     const mutationToEdit = realm.mutation!.objectForPrimaryKey(
+      //       "Mutation",
+      //       id,
+      //     );
+      //     if (mutationToEdit) {
+      //       mutationToEdit.amount = values.amount;
+      //       mutationToEdit.categoryId = values.categoryId;
+      //       mutationToEdit.description = values.description;
+      //       mutationToEdit.categoryName = values.categoryName;
+      //       mutationToEdit.rate = values.rate;
+      //       mutationToEdit.rateTo = values.rateTo;
+      //     }
+      //   });
+      // } else {
+      //   realm.mutation!.write(() => {
+      //     realm.mutation?.create("Mutation", {
+      //       ...values,
+      //       amount: Number(values.amount) * (values.rate || 0),
+      //       rateFrom: credential?.user?.defaultBaseRate!,
+      //     } as MutationCreateInput);
+      //   });
+      // }
+      // navigate(HOME_SCREEN_ROUTE);
     } catch (e) {
       console.log(e);
     }
@@ -157,18 +180,29 @@ export default function MutationForm(props: Props) {
             gap: 20,
           }}
         >
+          {isAdmin && !id && (
+            <StyledView>
+              <UserSelectInput name="userId" excludeAdmin />
+            </StyledView>
+          )}
           <Input
             type="select"
             name="type"
             options={typeSelectOptions}
             label="Mutation Type"
           />
-          <CategorySelectInput
-            userId={uid}
-            name="categoryId"
-            label="Category"
-            onAfterChange={(value) => methods.setValue("categoryName", value)}
-          />
+          <FieldWatcher name={["userId"]}>
+            {([uid]) => (
+              <CategorySelectInput
+                userId={uid}
+                name="categoryId"
+                label="Category"
+                onAfterChange={(value) =>
+                  methods.setValue("categoryName", value)
+                }
+              />
+            )}
+          </FieldWatcher>
           <Input type="date" name="transactionAt" label="Transaction At" />
           <Input
             type="number"

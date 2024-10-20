@@ -6,11 +6,11 @@ import useGetWalletByUser from "./use-get-wallet-by-user";
 import { resetTime } from "../../../utils/date";
 import { startOfYear } from "date-fns";
 
-export default function useYearSelect() {
+export default function useYearSelect(props: { userId: string }) {
   const [value, setValue] = React.useState<string>(
     startOfYear(resetTime(new Date())).toISOString(),
   );
-  const { wallets } = useGetWalletByUser();
+  const { wallets } = useGetWalletByUser(props);
   const yearOptions: SelectInputOption[] = React.useMemo(() => {
     const marker: number[] = [];
     const options: SelectInputOption[] = [];
@@ -32,6 +32,8 @@ export default function useYearSelect() {
       <SelectInput
         options={yearOptions}
         value={value}
+        disabled={!yearOptions.length}
+        placeholder={!yearOptions.length ? "No Data" : "Select Month"}
         onChange={(value) => setValue(value as string)}
       />
     ),

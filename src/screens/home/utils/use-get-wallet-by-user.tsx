@@ -3,7 +3,7 @@ import { useCredential } from "../../../hooks/use-credential";
 import { useRealm } from "../../../hooks/use-realm";
 import { Wallet } from "../../../store/auth.schema";
 
-export default function useGetWalletByUser() {
+export default function useGetWalletByUser(props: { userId: string }) {
   const realm = useRealm();
 
   const { credential } = useCredential();
@@ -13,7 +13,7 @@ export default function useGetWalletByUser() {
     if (realm.wallet) {
       const walletData = realm.wallet
         ?.objects("Wallet")
-        .filtered(`userId == $0`, `${credential?.user?._id}`);
+        .filtered(`userId == $0`, props.userId);
 
       const _wallets = (walletData || []) as unknown as Wallet[];
       setWallets([..._wallets]);
@@ -23,6 +23,6 @@ export default function useGetWalletByUser() {
       walletData.addListener(listener);
       return () => walletData.removeListener(listener);
     }
-  }, [realm.wallet]);
+  }, [realm.wallet, props.userId]);
   return { wallets };
 }

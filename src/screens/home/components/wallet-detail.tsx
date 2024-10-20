@@ -7,9 +7,11 @@ import { endOfMonth, format } from "date-fns";
 import { string2money } from "../../../utils/string";
 import { useNavigation } from "../../../hooks/use-navigation";
 import { MUTATION_SCREEN_GROUP_ROUTE } from "../../../../router-type";
+import { useRealm } from "../../../hooks/use-realm";
 
 interface Props {
   wallet: Wallet;
+  userId: string;
 }
 
 function WalletText({
@@ -34,7 +36,7 @@ function WalletText({
   );
 }
 export default function WalletDetail(props: Props) {
-  const { wallet } = props;
+  const { wallet, userId } = props;
   const { credential } = useCredential();
   const currency = credential?.user?.defaultBaseRate!;
   const expense = wallet?.expense || 0;
@@ -50,7 +52,7 @@ export default function WalletDetail(props: Props) {
         navigate(MUTATION_SCREEN_GROUP_ROUTE, {
           endAt: endMonth,
           startAt: startMonth,
-          userId: credential?.user?._id.toString()!,
+          userId,
         })
       }
     >

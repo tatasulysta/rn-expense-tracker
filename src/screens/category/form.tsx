@@ -20,24 +20,28 @@ import UserSelectInput from "../components/user-state-select-input";
 import Header from "../../components/widgets/header";
 interface Props {
   id?: string;
+  userId?: string;
 }
 
-const validation = (isAdmin: boolean) =>
+const validation = (isAdmin: boolean, isEdit: boolean) =>
   Yup.object({
     color: Yup.string().required(),
     icon: Yup.string().required(),
     label: Yup.string().required(),
-    ...(isAdmin && {
-      userId: Yup.string().required(),
-    }),
+    ...(isAdmin &&
+      !isEdit && {
+        userId: Yup.string().required(),
+      }),
   });
 
 export default function CategoryForm(props: Props) {
-  const { id } = props;
+  const { id, userId: _userId } = props;
   const { credential } = useCredential();
   const { navigate } = useNavigation();
   const realm = useRealm();
-  const category = realm.category!.objectForPrimaryKey("Category", props.id);
+  const category = id
+    ? realm.category!.objectForPrimaryKey("Category", props.id)
+    : undefined;
   const _category = category as unknown as Category | undefined;
   const [color, setColor] = React.useState<string>(
     _category?.color || CategoryColor[0],
@@ -47,7 +51,7 @@ export default function CategoryForm(props: Props) {
   );
 
   const [label, setLabel] = React.useState<string>(_category?.label || "");
-  const [userId, setUserId] = React.useState<string>("");
+  const [userId, setUserId] = React.useState<string>(_userId || "");
 
   const isAdmin = credential?.user?.type === UserTypeEnum.Admin;
   const onSave = async () => {
@@ -59,7 +63,7 @@ export default function CategoryForm(props: Props) {
     };
 
     try {
-      await validation(isAdmin).validate(values);
+      await validation(isAdmin, !!id).validate(values);
       if (id) {
         realm.category!.write(() => {
           category!.color = color;
@@ -98,7 +102,7 @@ export default function CategoryForm(props: Props) {
             </StyledText>
           </StyledView>
         </StyledView>
-        {isAdmin && (
+        {isAdmin && !id && (
           <StyledView>
             <UserSelectInput
               value={userId}

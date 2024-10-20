@@ -66,6 +66,7 @@ export default function SignIn() {
         .filtered(`email = "${values.email}"`)[0];
       if (user) {
         const isValidPassword = values.password === user.password;
+
         if (isValidPassword) {
           // Generate JWT upon successful login
           const token = await sign(

@@ -91,18 +91,20 @@ export default function SignUp() {
         throw new Error("This email registered! Use other email!");
       }
       const _user = realm.user!.write(() => realm.user?.create("User", values));
-      const user = _user as unknown as User;
-      realm.category!.write(() => {
-        createCategories(`${user._id}`).map((cat) =>
-          realm.category?.create("Category", cat),
-        );
-      });
-      realm.wallet!.write(() => {
-        realm.wallet?.create("Wallet", {
-          date: startOfMonth(resetTime(new Date())),
-          userId: `${user._id}`,
-        } as WalletCreateInput);
-      });
+      if (values.type === UserTypeEnum.User) {
+        const user = _user as unknown as User;
+        realm.category!.write(() => {
+          createCategories(`${user._id}`).map((cat) =>
+            realm.category?.create("Category", cat),
+          );
+        });
+        realm.wallet!.write(() => {
+          realm.wallet?.create("Wallet", {
+            date: startOfMonth(resetTime(new Date())),
+            userId: `${user._id}`,
+          } as WalletCreateInput);
+        });
+      }
       methods.reset();
 
       navigate(SIGN_IN_SCREEN_ROUTE);

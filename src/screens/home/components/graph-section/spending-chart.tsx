@@ -3,12 +3,9 @@ import { useRealm } from "../../../../hooks/use-realm";
 import { useCredential } from "../../../../hooks/use-credential";
 import useMonthSelect from "../../utils/use-month-select";
 import { resetTime } from "../../../../utils/date";
-import { endOfMonth, endOfYear } from "date-fns";
-import { Mutation } from "../../../../store/auth.schema";
-import useBreakdownMutation, {
-  generateMonthRange,
-  useBreakdownMutationByDate,
-} from "../../utils/use-breakdown-mutation";
+import { endOfMonth } from "date-fns";
+import { Mutation, UserTypeEnum } from "../../../../store/auth.schema";
+import { useBreakdownMutationByDate } from "../../utils/use-breakdown-mutation";
 import useYearSelect from "../../utils/use-year-select";
 import { StyledText, StyledView } from "../../../../components/common";
 import Badge from "./badge";
@@ -16,40 +13,49 @@ import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import { GRAPH_CONFIG } from "../../utils/graph-color";
 import DefaultScrollView from "../../../../components/common/scroll-view";
+import UserSelectInput from "../../../components/user-state-select-input";
 
 export default function SpendingChart() {
   const realm = useRealm();
+
   const { credential } = useCredential();
-  const { Component, value: startOfMonth } = useMonthSelect();
-  const { Component: YearComponent, value: year } = useYearSelect();
-  const [type, setType] = React.useState<"monthly" | "weekly">("monthly");
-  const [mutations, setMutations] = React.useState<Mutation[]>([]);
   const uid = `${credential?.user?._id}`;
+  const isAdmin = credential?.user?.type === UserTypeEnum.Admin;
+
+  const [mutations, setMutations] = React.useState<Mutation[]>([]);
+  const [type, setType] = React.useState<"monthly" | "weekly">("monthly");
+  const [userId, setUserId] = React.useState<string>(isAdmin ? "" : uid);
+
+  const { Component, value: startOfMonth } = useMonthSelect({ userId });
+  const { Component: YearComponent, value: year } = useYearSelect({ userId });
 
   React.useEffect(() => {
     if (realm.mutation) {
-      const mutationData = realm.mutation?.objects("Mutation");
+      // if (type === "weekly") {
+      const _startOfMonth = resetTime(new Date(startOfMonth));
 
-      if (type === "weekly") {
-        const _startOfMonth = resetTime(new Date(startOfMonth));
-
-        const eom = resetTime(endOfMonth(_startOfMonth));
-        mutationData.filtered(
-          `userId == $0 && transactionAt >= $1 && transactionAt <= $2`,
-          uid,
+      const eom = resetTime(endOfMonth(_startOfMonth));
+      const mutationData = realm.mutation
+        ?.objects("Mutation")
+        .filtered(
+          "userId == $0 && transactionAt >= $1 && transactionAt <= $2",
+          userId,
           _startOfMonth,
           eom,
         );
-      } else {
-        const foy = new Date(year);
-        const eoy = resetTime(endOfYear(foy));
-        mutationData.filtered(
-          `userId == $0 && transactionAt >= $1 && transactionAt <= $2`,
-          uid,
-          foy,
-          eoy,
-        );
-      }
+
+      // } else {
+      //   console.log("re-trigger", userId);
+
+      //   const foy = new Date(year);
+      //   const eoy = resetTime(endOfYear(foy));
+      //   mutationData.filtered(
+      //     `userId == $0 && transactionAt >= $1 && transactionAt <= $2`,
+      //     userId,
+      //     foy,
+      //     eoy,
+      //   );
+      // }
 
       const _wallets = (mutationData || []) as unknown as Mutation[];
       setMutations([..._wallets]);
@@ -59,8 +65,7 @@ export default function SpendingChart() {
       mutationData.addListener(listener);
       return () => mutationData.removeListener(listener);
     }
-  }, [realm.wallet, startOfMonth, type, year]);
-
+  }, [realm.wallet, startOfMonth, type, year, userId]);
   const { mutationGroup } = useBreakdownMutationByDate({
     year: new Date(year).getFullYear(),
     mutations,
@@ -68,8 +73,18 @@ export default function SpendingChart() {
   });
 
   return (
-    <StyledView className="gap-y-3">
-      <StyledView>
+    <StyledView className="gap-y-3 mt-3">
+      {isAdmin && (
+        <UserSelectInput
+          excludeAdmin
+          onChange={(value) => {
+            setUserId(value);
+          }}
+          value={userId}
+        />
+      )}
+      {type === "weekly" ? Component : YearComponent}
+      <StyledView className="gap-y-3">
         <StyledView className="flex flex-row gap-x-1 mb-2" style={{ gap: 8 }}>
           <Badge
             value="monthly"
@@ -83,7 +98,6 @@ export default function SpendingChart() {
           </Badge>
         </StyledView>
       </StyledView>
-      {type === "weekly" ? Component : YearComponent}
       <DefaultScrollView horizontal>
         <LineChart
           data={{

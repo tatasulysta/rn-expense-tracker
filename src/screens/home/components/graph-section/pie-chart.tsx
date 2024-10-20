@@ -1,7 +1,11 @@
 import React from "react";
 import { useCredential } from "../../../../hooks/use-credential";
 import { useRealm } from "../../../../hooks/use-realm";
-import { Mutation, MutationType } from "../../../../store/auth.schema";
+import {
+  Mutation,
+  MutationType,
+  UserTypeEnum,
+} from "../../../../store/auth.schema";
 import { resetTime } from "../../../../utils/date";
 import { endOfMonth } from "date-fns";
 import { StyledText, StyledView } from "../../../../components/common";
@@ -11,14 +15,18 @@ import { Dimensions } from "react-native";
 import useMonthSelect from "../../utils/use-month-select";
 import Badge from "./badge";
 import useBreakdownMutation from "../../utils/use-breakdown-mutation";
+import UserSelectInput from "../../../components/user-state-select-input";
 
 export default function GraphMonth() {
   const realm = useRealm();
   const { credential } = useCredential();
-  const { Component, value: startOfMonth } = useMonthSelect();
-  const [type, setType] = React.useState<"income" | "expense">("expense");
 
   const uid = `${credential?.user?._id}`;
+  const isAdmin = credential?.user?.type === UserTypeEnum.Admin;
+
+  const [type, setType] = React.useState<"income" | "expense">("expense");
+  const [userId, setUserId] = React.useState<string>(isAdmin ? "" : uid);
+  const { Component, value: startOfMonth } = useMonthSelect({ userId });
 
   const [mutations, setMutations] = React.useState<Mutation[]>([]);
   const mutationGroup = useBreakdownMutation({ mutations });
@@ -33,7 +41,7 @@ export default function GraphMonth() {
         ?.objects("Mutation")
         .filtered(
           `userId == $0 && transactionAt >= $1 && transactionAt <= $2`,
-          uid,
+          userId,
           _startOfMonth,
           eom,
         );
@@ -46,12 +54,22 @@ export default function GraphMonth() {
       mutationData.addListener(listener);
       return () => mutationData.removeListener(listener);
     }
-  }, [realm.wallet, startOfMonth]);
+  }, [realm.wallet, startOfMonth, userId]);
 
   const datas = Object.keys(mutationGroup[type].datas);
   return (
-    <StyledView className="gap-y-3">
-      <StyledView>
+    <StyledView className="gap-y-3 mt-3">
+      <StyledView className="gap-y-3">
+        {isAdmin && (
+          <UserSelectInput
+            onChange={(value) => {
+              setUserId(value);
+            }}
+            value={userId}
+            excludeAdmin
+          />
+        )}
+        {Component}
         <StyledView className="flex flex-row gap-x-1 mb-2 " style={{ gap: 8 }}>
           <Badge
             value="expense"
@@ -65,7 +83,6 @@ export default function GraphMonth() {
           </Badge>
         </StyledView>
       </StyledView>
-      {Component}
       <StyledView className="flex flex-1">
         {!datas.length && (
           <StyledText className="text-base"> No Data</StyledText>

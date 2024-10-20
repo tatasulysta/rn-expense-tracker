@@ -29,7 +29,7 @@ export default function CategorySelectInput(props: Props) {
         ?.objects("Category")
         .filtered(`userId == $0`, userId) as unknown as Category[]) || []
     );
-  }, [realm.category]);
+  }, [realm.category, userId]);
 
   return (
     <InputBaseWrapper
