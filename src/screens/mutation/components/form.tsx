@@ -140,31 +140,31 @@ export default function MutationForm(props: Props) {
           }
         }
       });
-      // if (id) {
-      //   realm.mutation?.write(() => {
-      //     const mutationToEdit = realm.mutation!.objectForPrimaryKey(
-      //       "Mutation",
-      //       id,
-      //     );
-      //     if (mutationToEdit) {
-      //       mutationToEdit.amount = values.amount;
-      //       mutationToEdit.categoryId = values.categoryId;
-      //       mutationToEdit.description = values.description;
-      //       mutationToEdit.categoryName = values.categoryName;
-      //       mutationToEdit.rate = values.rate;
-      //       mutationToEdit.rateTo = values.rateTo;
-      //     }
-      //   });
-      // } else {
-      //   realm.mutation!.write(() => {
-      //     realm.mutation?.create("Mutation", {
-      //       ...values,
-      //       amount: Number(values.amount) * (values.rate || 0),
-      //       rateFrom: credential?.user?.defaultBaseRate!,
-      //     } as MutationCreateInput);
-      //   });
-      // }
-      // navigate(HOME_SCREEN_ROUTE);
+      if (id) {
+        realm.mutation?.write(() => {
+          const mutationToEdit = realm.mutation!.objectForPrimaryKey(
+            "Mutation",
+            id,
+          );
+          if (mutationToEdit) {
+            mutationToEdit.amount = values.amount;
+            mutationToEdit.categoryId = values.categoryId;
+            mutationToEdit.description = values.description;
+            mutationToEdit.categoryName = values.categoryName;
+            mutationToEdit.rate = values.rate;
+            mutationToEdit.rateTo = values.rateTo;
+          }
+        });
+      } else {
+        realm.mutation!.write(() => {
+          realm.mutation?.create("Mutation", {
+            ...values,
+            amount: Number(values.amount) * (values.rate || 0),
+            rateFrom: credential?.user?.defaultBaseRate!,
+          } as MutationCreateInput);
+        });
+      }
+      navigate(HOME_SCREEN_ROUTE);
     } catch (e) {
       console.log(e);
     }
