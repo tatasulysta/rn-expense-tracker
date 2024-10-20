@@ -20,6 +20,7 @@
     "expo": "~51.0.28",
     "expo-dev-client": "~4.0.28",
     "expo-status-bar": "~1.12.1",
+    "expo-updates": "~0.25.27",
     "nativewind": "^2.0.11",
     "numeral": "^2.0.6",
     "phosphor-react-native": "^1.1.2",

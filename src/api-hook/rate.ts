@@ -1,5 +1,4 @@
 import useFetch from "../hooks/use-fetch";
-import { customFetch } from "./common";
 import { EXCHANGE_RATE_API_KEY } from "@env";
 
 interface RateRespondModel {
