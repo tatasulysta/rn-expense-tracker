@@ -47,7 +47,7 @@ export default function WalletDetail(props: Props) {
 
   return (
     <BaseButton
-      className="rounded-xl p-4 gap-y-2 flex-grow-0 bg-fuchsia-100 "
+      className="rounded-xl p-4 bg-fuchsia-100"
       onPress={() =>
         navigate(MUTATION_SCREEN_GROUP_ROUTE, {
           endAt: endMonth,
@@ -56,19 +56,21 @@ export default function WalletDetail(props: Props) {
         })
       }
     >
-      <StyledText className="text-neutral-700">{`${format(
-        startMonth,
-        "dd/MM/yyyy",
-      )} - ${format(endMonth, "dd/MM/yyyy")}`}</StyledText>
-      <StyledView className="flex-row flex-1 justify-between">
-        <WalletText
-          amount={income - expense}
-          currency={currency}
-          label="Total"
-        />
-        <WalletText amount={income} currency={currency} label="Income" />
+      <StyledView className="flex flex-col gap-y-2">
+        <StyledText className="text-neutral-700">{`${format(
+          startMonth,
+          "dd/MM/yyyy",
+        )} - ${format(endMonth, "dd/MM/yyyy")}`}</StyledText>
+        <StyledView className="flex-row flex-1 justify-between">
+          <WalletText
+            amount={income - expense}
+            currency={currency}
+            label="Total"
+          />
+          <WalletText amount={income} currency={currency} label="Income" />
 
-        <WalletText amount={expense} currency={currency} label="Expense" />
+          <WalletText amount={-expense} currency={currency} label="Expense" />
+        </StyledView>
       </StyledView>
     </BaseButton>
   );

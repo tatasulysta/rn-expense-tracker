@@ -69,7 +69,7 @@ export default function GraphMonth() {
             excludeAdmin
           />
         )}
-        {Component}
+        <StyledView>{Component}</StyledView>
         <StyledView className="flex flex-row gap-x-1 mb-2 " style={{ gap: 8 }}>
           <Badge
             value="expense"
@@ -85,7 +85,7 @@ export default function GraphMonth() {
       </StyledView>
       <StyledView className="flex flex-1">
         {!datas.length && (
-          <StyledText className="text-base"> No Data</StyledText>
+          <StyledText className="text-base text-center"> No Data</StyledText>
         )}
         <PieChart
           data={datas.map((key, index) => {

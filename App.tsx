@@ -1,11 +1,12 @@
 import { withExpoSnack } from "nativewind";
 import Route from "./router";
-import { User } from "./src/store/auth.schema";
+
 import Credential, { CredentialModel } from "./src/hooks/use-credential";
 import React from "react";
 import { DrawerProvider } from "./src/hooks/use-drawer";
 import { RealmProvider } from "./src/hooks/use-realm";
 import { LOCAL_STORAGE_KEY } from "./src/utils/constants";
+import { localStorage } from "./src/helpers/local-storage";
 
 function App() {
   const [persistState, setPersistState] = React.useState<CredentialModel>({

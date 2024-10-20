@@ -56,21 +56,19 @@ export default function MutationScreen(props: Props) {
 
   return (
     <DefaultLayout header={<Header title="Mutation"></Header>}>
-      <DefaultScrollView className="gap-y-3">
-        <DefaultScrollView contentContainerStyle={{ gap: 20 }}>
-          {mutation.map((mutation, index) => (
-            <MutationButton key={mutation._id.toString()} mutation={mutation} />
-          ))}
+      <DefaultScrollView contentContainerStyle={{ gap: 20 }}>
+        {mutation.map((mutation, index) => (
+          <MutationButton key={mutation._id.toString()} mutation={mutation} />
+        ))}
 
-          <Button onPress={() => navigate(MUTATION_CREATE_SCREEN_ROUTE)}>
-            <StyledText
-              className="max-w-fit text-center text-ellipsis text-nowrap"
-              numberOfLines={2}
-            >
-              Add New Mutation
-            </StyledText>
-          </Button>
-        </DefaultScrollView>
+        <Button onPress={() => navigate(MUTATION_CREATE_SCREEN_ROUTE)}>
+          <StyledText
+            className="max-w-fit text-center text-ellipsis text-nowrap"
+            numberOfLines={2}
+          >
+            Add New Mutation
+          </StyledText>
+        </Button>
       </DefaultScrollView>
     </DefaultLayout>
   );
@@ -84,7 +82,7 @@ function MutationButton(props: { mutation: Mutation }) {
   return (
     <BaseButton
       className={`rounded-xl p-4  flex-grow-0  ${
-        mutation.type == MutationType.Expense ? "bg-green-100" : "bg-blue-100"
+        mutation.type == MutationType.Expense ? "bg-pink-50" : "bg-blue-50"
       } `}
       onPress={() =>
         navigate(MUTATION_VIEW_SCREEN_ROUTE, {

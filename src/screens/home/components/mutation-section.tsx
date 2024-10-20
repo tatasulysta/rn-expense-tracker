@@ -36,29 +36,22 @@ export default function MutationSection() {
 
   return (
     <SectionWrapper title="Latest Summary">
-      <StyledView>
-        {isAdmin && (
-          <UserSelectInput
-            value={userId}
-            onChange={(value) => setUserId(value)}
-            excludeAdmin
-          />
-        )}
-        {!wallets.length && (
-          <StyledText className="text-base text-center"> No Data</StyledText>
-        )}
-        <DefaultFlatList
-          data={wallets}
-          contentContainerStyle={{
-            gap: 20,
-            marginTop: 20,
-          }}
-          renderItem={({ item }) => (
-            <WalletDetail wallet={item} key={`${item._id}`} userId={userId} />
-          )}
-          keyExtractor={(item) => item}
+      {isAdmin && (
+        <UserSelectInput
+          value={userId}
+          onChange={(value) => setUserId(value)}
+          excludeAdmin
         />
-      </StyledView>
+      )}
+      {!wallets.length && (
+        <StyledText className="text-base text-center"> No Data</StyledText>
+      )}
+
+      {wallets.map((wallet) => (
+        <StyledView key={wallet._id.toString()} className="mt-3">
+          <WalletDetail wallet={wallet} userId={userId} />
+        </StyledView>
+      ))}
     </SectionWrapper>
   );
 }

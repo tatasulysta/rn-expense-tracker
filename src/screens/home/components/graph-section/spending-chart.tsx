@@ -73,18 +73,19 @@ export default function SpendingChart() {
   });
 
   return (
-    <StyledView className="gap-y-3 mt-3">
-      {isAdmin && (
-        <UserSelectInput
-          excludeAdmin
-          onChange={(value) => {
-            setUserId(value);
-          }}
-          value={userId}
-        />
-      )}
-      {type === "weekly" ? Component : YearComponent}
-      <StyledView className="gap-y-3">
+    <StyledView className="mt-3">
+      <StyledView className="gap-y-3 flex flex-col">
+        {isAdmin && (
+          <UserSelectInput
+            excludeAdmin
+            onChange={(value) => {
+              setUserId(value);
+            }}
+            value={userId}
+          />
+        )}
+        <StyledView>{type === "weekly" ? Component : YearComponent}</StyledView>
+
         <StyledView className="flex flex-row gap-x-1 mb-2" style={{ gap: 8 }}>
           <Badge
             value="monthly"

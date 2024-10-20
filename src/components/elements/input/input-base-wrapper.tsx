@@ -21,7 +21,7 @@ export default function InputBaseWrapper(props: InputBaseProps) {
           {label}
         </StyledText>
       )}
-      <StyledView className={`w-fit flex flex-row gap-2 items-center`}>
+      <StyledView className={` w-fit flex flex-row gap-2 items-center `}>
         {leftSection}
         <StyledView className="mt-1 flex-1">{children}</StyledView>
         {rightSection}

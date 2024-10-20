@@ -24,6 +24,7 @@ import DefaultScrollView from "../components/common/scroll-view";
 import { CategoryColor, CategoryIcon } from "./category/helper";
 import { format, startOfMonth } from "date-fns";
 import { resetTime } from "../utils/date";
+import TextInfo from "../components/common/text-info";
 
 const defaultValues: UserCreateInput = {
   defaultBaseRate: "",
@@ -125,12 +126,9 @@ export default function SignUp() {
             </StyledView>
             <StyledView>
               <RoleSelectInput name="type" disabled={false} />
-              <StyledView className="flex flex-1 items-center flex-row gap-2 mt-1 text-neutral-500">
-                <InfoIcon size={16} />
-                <StyledText className="text-sm">
-                  Each device only can have one Admin
-                </StyledText>
-              </StyledView>
+              <TextInfo withIndent>
+                Each device only can have one Admin
+              </TextInfo>
             </StyledView>
 
             <Input
