@@ -7,6 +7,7 @@ import { DrawerProvider } from "./src/hooks/use-drawer";
 import { RealmProvider } from "./src/hooks/use-realm";
 import { LOCAL_STORAGE_KEY } from "./src/utils/constants";
 import { localStorage } from "./src/helpers/local-storage";
+import Toast from "react-native-toast-message";
 
 function App() {
   const [persistState, setPersistState] = React.useState<CredentialModel>({
@@ -28,14 +29,20 @@ function App() {
     exec();
   }, []);
 
+  if (persistState.isLoading) {
+    return <></>;
+  }
   return (
-    <Credential credential={persistState}>
-      <DrawerProvider>
-        <RealmProvider>
-          <Route />
-        </RealmProvider>
-      </DrawerProvider>
-    </Credential>
+    <>
+      <Credential credential={persistState}>
+        <DrawerProvider>
+          <RealmProvider>
+            <Route />
+          </RealmProvider>
+        </DrawerProvider>
+      </Credential>
+      <Toast position="top" />
+    </>
   );
 }
 

@@ -29,7 +29,7 @@ import { HOME_SCREEN_ROUTE } from "../../../../router-type";
 import CategorySelectInput from "../../components/category-select-input";
 import { resetTime } from "../../../utils/date";
 import UserSelectInput from "../../components/user-select-input";
-import { EyedropperSample } from "phosphor-react-native";
+import { toast } from "../../../utils/notification";
 
 interface Props {
   id?: string;
@@ -165,8 +165,8 @@ export default function MutationForm(props: Props) {
         });
       }
       navigate(HOME_SCREEN_ROUTE);
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      toast.error(e?.message);
     }
   };
 

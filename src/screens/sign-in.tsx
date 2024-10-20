@@ -18,6 +18,7 @@ import { useRealm } from "../hooks/use-realm";
 import { useNavigation } from "../hooks/use-navigation";
 import Button from "../components/elements/button";
 import DefaultScrollView from "../components/common/scroll-view";
+import { toast } from "../utils/notification";
 
 type FormType = {
   password: string;
@@ -68,24 +69,23 @@ export default function SignIn() {
         const isValidPassword = values.password === user.password;
 
         if (isValidPassword) {
-          // Generate JWT upon successful login
           const token = await sign(
             {
               iss: values.email,
               exp: new Date().getTime() + 3600 * 1000,
-            }, // body
+            },
             SECRET_KEY,
             {
               alg: "HS256",
             },
           );
-          setCredential({ user: { ...user, token } });
+          setCredential({ ...(user as any), token });
           goToMain();
-        } else {
-          console.log("Incorrect password!");
-        }
-      }
-    } catch {}
+        } else throw new Error("Email/Password inccorect!");
+      } else throw new Error("Email/Password inccorect!");
+    } catch (e: any) {
+      toast.error(e.message);
+    }
   };
 
   return (

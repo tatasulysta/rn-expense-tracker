@@ -25,6 +25,7 @@ import { CategoryColor, CategoryIcon } from "./category/helper";
 import { format, startOfMonth } from "date-fns";
 import { resetTime } from "../utils/date";
 import TextInfo from "../components/common/text-info";
+import { toast } from "../utils/notification";
 
 const defaultValues: UserCreateInput = {
   defaultBaseRate: "",
@@ -109,8 +110,8 @@ export default function SignUp() {
       methods.reset();
 
       navigate(SIGN_IN_SCREEN_ROUTE);
-    } catch (e) {
-      console.log("Error", e);
+    } catch (e: any) {
+      toast.error(e?.message);
     }
   };
 

@@ -2,6 +2,7 @@ import {
   CompositeNavigationProp,
   NavigationContainer,
   RouteProp,
+  useFocusEffect,
   useNavigation,
 } from "@react-navigation/native";
 import {
@@ -32,7 +33,7 @@ import {
 } from "@react-navigation/native-stack";
 import Home from "./src/screens/home";
 import MutationScreen from "./src/screens/mutation";
-import { HomeIcon, MutationIcon, UserIcon } from "./src/assets";
+import { HomeIcon, UserIcon } from "./src/assets";
 import ProfileScreen from "./src/screens/profile";
 import { Dimensions, Platform } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -46,6 +47,8 @@ import CategoryView from "./src/screens/category/view";
 import MutationCreate from "./src/screens/mutation/create";
 import CategoryScreen from "./src/screens/category";
 import MutationView from "./src/screens/mutation/view";
+import { isEmpty } from "./src/utils/object";
+import React from "react";
 
 export type ParamsList = {
   [SIGN_IN_SCREEN_ROUTE]: SIGN_IN_SCREEN_PARAMS;
@@ -170,6 +173,7 @@ function Main() {
 }
 export default function Route() {
   const { credential } = useCredential();
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -178,7 +182,7 @@ export default function Route() {
           headerShown: false,
         }}
       >
-        {!!credential && !!credential?.user ? (
+        {!isEmpty(credential?.user || ({} as any)) ? (
           <>
             <Stack.Screen name="Main" component={Main} />
             <Stack.Screen

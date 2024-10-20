@@ -18,6 +18,7 @@ import ColorSelector from "./components/color-selector";
 import IconSelector from "./components/icon-selector";
 import UserSelectInput from "../components/user-state-select-input";
 import Header from "../../components/widgets/header";
+import { toast } from "../../utils/notification";
 interface Props {
   id?: string;
   userId?: string;
@@ -81,8 +82,8 @@ export default function CategoryForm(props: Props) {
           });
         });
       navigate(HOME_SCREEN_ROUTE);
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      toast.error(e?.message);
     }
   };
 

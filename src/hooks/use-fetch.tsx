@@ -1,5 +1,6 @@
 import React from "react";
 import { customFetch } from "../api-hook/common";
+import { toast } from "../utils/notification";
 
 interface Props {
   uri: string;
@@ -18,7 +19,8 @@ export default function useFetch<T>(props: Props) {
       const data = await res.json();
       setData(data);
       setLoading(false);
-    } catch (e) {
+    } catch (e: any) {
+      toast.error(e);
       setError("An error occurred. Awkward..");
     }
   };

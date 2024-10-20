@@ -1,16 +1,19 @@
 import * as React from "react";
 import { localStorage } from "../helpers/local-storage";
 import { User } from "../store/auth.schema";
-import { LOCAL_STORAGE_KEY } from "../utils/constants";
+import { LOCAL_STORAGE_KEY, SECRET_KEY } from "../utils/constants";
+import { useFocusEffect } from "@react-navigation/native";
+import { decode } from "react-native-pure-jwt";
 
+export type UserModel = (User & { token: string }) | undefined;
 export type CredentialModel = {
-  user: (User & { token: string }) | undefined;
+  user: UserModel;
   isLoading: boolean;
 };
 
 export interface CredentialStateProps {
   credential?: CredentialModel;
-  setCredential: React.Dispatch<React.SetStateAction<any>>;
+  setCredential: (params: UserModel) => void;
 }
 
 export const CredentialContext = React.createContext<CredentialStateProps>({
@@ -33,7 +36,7 @@ export default function Credential(props: Props) {
   const value = React.useMemo<CredentialStateProps>(
     () => ({
       credential: userCredential,
-      setCredential: async (credential) => {
+      setCredential: async (credential: UserModel) => {
         if (!credential) {
           await localStorage.removeItem(LOCAL_STORAGE_KEY.credential);
           setUserCredential(undefined);
@@ -42,7 +45,7 @@ export default function Credential(props: Props) {
             LOCAL_STORAGE_KEY.credential,
             JSON.stringify(credential),
           );
-          setUserCredential(credential);
+          setUserCredential({ user: credential, isLoading: false });
         }
       },
     }),
