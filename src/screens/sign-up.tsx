@@ -56,7 +56,7 @@ const createCategories = (uId: string): CategoryCreateInput[] => [
   {
     color: CategoryColor[7],
     icon: "money",
-    label: "Expense",
+    label: "Utility",
     type: CategoryType.Personal,
     userId: `${uId}`,
   },
